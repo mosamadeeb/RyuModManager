@@ -1,0 +1,3 @@
+[submodule "ParManager"]
+	path = ParManager
+	url = https://github.com/Kaplas80/ParManager.git
