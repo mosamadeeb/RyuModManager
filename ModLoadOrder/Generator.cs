@@ -99,6 +99,7 @@ namespace ModLoadOrder
             {
                 // Repack pars
                 await Repacker.RepackDictionary(parDictionary).ConfigureAwait(false);
+                //Repacker.RepackDictionary(parDictionary).Wait();
             }
         }
     }

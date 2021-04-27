@@ -57,12 +57,12 @@ namespace ModLoadOrder.Mods
             if (needsRepack)
             {
                 // Add this folder to the list of folders to be repacked and stop recursing
-                this.ParFolders.Add(path);
+                this.ParFolders.Add(GamePath.GetDataPathFrom(path));
             }
             else
             {
                 // Add files in current directory
-                this.Files.AddRange(Directory.GetFiles(path).Select(f => GamePath.GetDataPath(f)));
+                this.Files.AddRange(Directory.GetFiles(path).Select(f => GamePath.GetDataPathFrom(f)));
 
                 // Get files for all subdirectories
                 foreach (string folder in Directory.GetDirectories(path))

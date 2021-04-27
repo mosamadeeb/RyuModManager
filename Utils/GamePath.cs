@@ -49,7 +49,7 @@ namespace Utils
             return path.Substring(path.IndexOf("data" + Path.DirectorySeparatorChar) + 4);
         }
 
-        public static string GetDataPath(string path)
+        public static string GetDataPathFrom(string path)
         {
             if (path.Contains(".parless"))
             {
@@ -61,29 +61,29 @@ namespace Utils
 
         public static string GetModPathFromDataPath(string mod, string path)
         {
-            return Path.Combine(GetModsPath(), mod, path);
+            return Path.Combine(GetModsPath(), mod, path.TrimStart(Path.DirectorySeparatorChar));
         }
 
         public static bool FileExistsInData(string path)
         {
-            return File.Exists(Path.Combine(GetDataPath(), path));
+            return File.Exists(Path.Combine(GetDataPath(), path.TrimStart(Path.DirectorySeparatorChar)));
         }
 
         public static bool DirectoryExistsInData(string path)
         {
-            return Directory.Exists(Path.Combine(GetDataPath(), path));
+            return Directory.Exists(Path.Combine(GetDataPath(), path.TrimStart(Path.DirectorySeparatorChar)));
         }
 
         public static bool ExistsInDataAsPar(string path)
         {
             if (GetBasename(path).EndsWith(".parless"))
             {
-                // Remove "less"
-                return FileExistsInData(path.Remove(path.Length - 4));
+                // Remove ".parless"
+                return FileExistsInData(RemoveParlessPath(path) + ".par");
             }
 
             // Add ".par"
-            return FileExistsInData(path + ".par");
+            return FileExistsInData(RemoveModPath(path) + ".par");
         }
 
         public static Game GetGame()
