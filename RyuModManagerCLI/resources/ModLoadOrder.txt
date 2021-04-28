@@ -1,0 +1,14 @@
+; This is the Mod Load Order file.
+; Add mod names to this file before running RyuModManagerCLI.
+; A mod's name is the name of its folder inside the /mods/ directory
+
+; Comments start with ';'.
+; You can comment out a mod to prevent it from being added to the load order.
+
+; Load order: LAST mod in the list has the HIGHEST priority, and its files
+; will override those of other mods if there are any conflicts.
+
+ExampleMod
+AnotherMod
+;CommentedOutMod
+
