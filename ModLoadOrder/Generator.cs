@@ -14,13 +14,7 @@ namespace ModLoadOrder
 {
     public static class Generator
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="mods">Mod names sorted in the desired order, from highest priority to lowest.</param>
-        /// <param name="looseFilesEnabled"></param>
-        /// <param name="verbose"></param>
-        public static async Task GenerateModLoadOrder(List<string> mods, bool looseFilesEnabled, bool verbose)
+        public static async Task GenerateModLoadOrder(List<string> mods, bool looseFilesEnabled)
         {
             List<int> modIndices = new List<int> { 0 };
             OrderedSet<string> files = new OrderedSet<string>();
@@ -34,9 +28,9 @@ namespace ModLoadOrder
 
             if (looseFilesEnabled)
             {
-                PrintLine("text", verbose);
-
                 loose.AddFiles(GamePath.GetDataPath(), game >= Game.Yakuza6 ? "DE" : "");
+
+                loose.PrintInfo();
 
                 if (game < Game.Yakuza6)
                 {
@@ -55,7 +49,12 @@ namespace ModLoadOrder
                 }
             }
 
+            Console.WriteLine($"Done reading {Constants.PARLESS_NAME}\n");
+
             Mod mod;
+            Console.WriteLine("Reading mods...\n");
+
+            // TODO: Make mod reading async
 
             // Use a reverse loop to be able to remove items from the list when necessary
             for (int i = mods.Count - 1; i >= 0; i--)
@@ -63,7 +62,9 @@ namespace ModLoadOrder
                 mod = new Mod(mods[i]);
                 mod.AddFiles(Path.Combine(GamePath.GetModsPath(), mods[i]), game >= Game.Yakuza6 ? "DE" : "");
 
-                if (mod.Files.Count > 0)
+                mod.PrintInfo();
+
+                if (mod.Files.Count > 0 || mod.ParFolders.Count > 0)
                 {
                     files.UnionWith(mod.Files);
                     modIndices.Add(files.Count);
@@ -88,18 +89,43 @@ namespace ModLoadOrder
                 }
             }
 
+            Console.WriteLine($"Added {mods.Count} mod(s) and {files.Count} file(s)!\n");
+
             // Reverse the list because the last mod in the list should have the highest priority
             mods.Reverse();
+
+            Console.Write($"Generating {Constants.MLO} file...");
 
             // Generate MLO
             ModLoadOrder mlo = new ModLoadOrder(modIndices, mods, files, loose.ParlessFolders);
             mlo.WriteMLO(Path.Combine(GamePath.GetGamePath(), Constants.MLO));
 
+            Console.WriteLine(" DONE!\n");
+
+            // Check if a mod has a par that will override the repacked par, and skip repacking it in that case
+            int matchIndex;
+            foreach (string key in parDictionary.Keys.ToList())
+            {
+                List<string> value = parDictionary[key];
+
+                // Faster lookup by checking in the OrderedSet
+                if (files.Contains(key + ".par"))
+                {
+                    // Get the mod's index from the ModLoadOrder's Files
+                    matchIndex = mlo.Files.Find(f => f.Item1 == key.Replace('\\', '/') + ".par").Item2;
+
+                    // Avoid repacking pars which exist as a file in mods that have a higher priority than the first mod in the par to be repacked
+                    if (mods.IndexOf(value[0]) > matchIndex)
+                    {
+                        parDictionary.Remove(key);
+                    }
+                }
+            }
+
             if (game < Game.Yakuza6)
             {
                 // Repack pars
                 await Repacker.RepackDictionary(parDictionary).ConfigureAwait(false);
-                //Repacker.RepackDictionary(parDictionary).Wait();
             }
         }
     }

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using ParLibrary;
 using ParLibrary.Converter;
 using Utils;
 
@@ -17,28 +16,52 @@ namespace ParRepacker
 
         public static async Task RepackDictionary(Dictionary<string, List<string>> parDictionary)
         {
-            var parTasks = new List<Task>();
+            var parTasks = new List<Task<ConsoleOutput>>();
 
             string pathToParlessMods = Path.Combine(GamePath.GetModsPath(), "Parless");
 
             if (Directory.Exists(pathToParlessMods))
             {
+                Console.Write("Removing old pars...");
+
                 // Clean up the /mods/Parless/ directory before processing the dictionary
                 // TODO: If .parmeta checks are implemented, this should be changed
                 Directory.Delete(pathToParlessMods, true);
+
+                Console.WriteLine(" DONE!\n");
             }
 
-            foreach (KeyValuePair<string, List<string>> parModPair in parDictionary)
+            if (parDictionary.Count == 0)
             {
-                RepackPar(parModPair.Key, parModPair.Value);
-                //parTasks.Add(Task.Run(() => RepackPar(parModPair.Key, parModPair.Value)));
+                Console.WriteLine("No pars to repack\n");
             }
+            else
+            {
+                Console.WriteLine("Repacking pars...\n");
 
-            await Task.WhenAll(parTasks).ConfigureAwait(false);
+                foreach (KeyValuePair<string, List<string>> parModPair in parDictionary)
+                {
+                    ConsoleOutput consoleOutput = new ConsoleOutput(2);
+                    parTasks.Add(Task.Run(() => RepackPar(parModPair.Key, parModPair.Value, consoleOutput)));
+                }
+
+                while (parTasks.Count > 0)
+                {
+                    var console = await Task.WhenAny(parTasks).ConfigureAwait(false);
+
+                    if (console != null)
+                    {
+                        console.Result.Flush();
+                    }
+
+                    parTasks.Remove(console);
+                }
+
+                Console.WriteLine($"Repacked {parDictionary.Count} par(s)!\n");
+            }
         }
 
-        //private static async Task RepackPar(string par, List<string> mods)
-        private static void RepackPar(string parName, List<string> mods)
+        private static async Task<ConsoleOutput> RepackPar(string parName, List<string> mods, ConsoleOutput console)
         {
             parName = parName.TrimStart(Path.DirectorySeparatorChar);
 
@@ -49,10 +72,12 @@ namespace ParRepacker
             // Dictionary of fileInPar, ModName
             Dictionary<string, string> fileDict = new Dictionary<string, string>();
 
+            console.WriteLine($"Repacking {parName + ".par"} ...");
+
             // Populate fileDict with the files inside each mod
             foreach (string mod in mods)
             {
-                foreach (string modFile in GetModFiles(parName, mod))
+                foreach (string modFile in GetModFiles(parName, mod, console))
                 {
                     fileDict.TryAdd(modFile, mod);
                 }
@@ -136,10 +161,11 @@ namespace ParRepacker
                 // Copy each file in the mods to the .partemp directory
                 foreach (KeyValuePair<string, string> fileModPair in fileDict)
                 {
-                    if (fileModPair.Value.StartsWith("Parless_"))
+                    if (fileModPair.Value.StartsWith(Constants.PARLESS_NAME))
                     {
+                        // 15 = ParlessMod.NAME.Length + 1
                         File.Copy(
-                            Path.Combine(GamePath.GetDataPath(), parName.Insert(int.Parse(fileModPair.Value.Substring(8)), ".parless"), fileModPair.Key),
+                            Path.Combine(GamePath.GetDataPath(), parName.Insert(int.Parse(fileModPair.Value.Substring(15)) - 1, ".parless"), fileModPair.Key),
                             Path.Combine(pathToTempPar, fileModPair.Key),
                             true);
                     }
@@ -166,93 +192,75 @@ namespace ParRepacker
                 };
 
                 // Create a node from the .partemp directory and write the par to pathToModPar
-                Console.Write("Reading input directory... ");
                 string nodeName = new DirectoryInfo(pathToTempPar).Name;
                 Node node = ReadDirectory(pathToTempPar, nodeName);
-                Console.WriteLine("DONE!");
 
                 bool overwrite = false;
-
-                // Check if overwrite.txt exists
-                for (int i = 0; i < node.Children.Count; i++)
-                {
-                    if (node.Children[i].Name == "overwrite.txt")
-                    {
-                        node.Children[i].Dispose();
-                        node.Remove(node.Children[i]);
-
-                        overwrite = true;
-                        break;
-                    }
-                }
 
                 // Store a reference to the nodes in the container to dispose of them later, as they are not disposed properly
                 NodeContainerFormat containerNode = node.GetFormatAs<NodeContainerFormat>();
 
-                if (overwrite)
-                {
-                    node.SortChildren((x, y) => string.CompareOrdinal(x.Name.ToLowerInvariant(), y.Name.ToLowerInvariant()));
-                    node.TransformWith<ParArchiveWriter, ParArchiveWriterParameters>(writerParameters);
-                }
-                else
-                {
-                    Console.Write("Reading PAR file... ");
-                    Node par = NodeFactory.FromFile(pathToPar, Yarhl.IO.FileOpenMode.Read);
-                    par.TransformWith<ParArchiveReader, ParArchiveReaderParameters>(readerParameters);
-                    writerParameters.IncludeDots = par.Children[0].Name == ".";
-                    Console.WriteLine("DONE!");
+                Node par = NodeFactory.FromFile(pathToPar, Yarhl.IO.FileOpenMode.Read);
+                par.TransformWith<ParArchiveReader, ParArchiveReaderParameters>(readerParameters);
+                writerParameters.IncludeDots = par.Children[0].Name == ".";
 
-                    Console.Write("Adding files... ");
-                    node.GetFormatAs<NodeContainerFormat>().MoveChildrenTo(writerParameters.IncludeDots ? par.Children[0] : par, true);
-                    par.SortChildren((x, y) => string.CompareOrdinal(x.Name.ToLowerInvariant(), y.Name.ToLowerInvariant()));
-                    Console.WriteLine("DONE!");
+                node.GetFormatAs<NodeContainerFormat>().MoveChildrenTo(writerParameters.IncludeDots ? par.Children[0] : par, true);
+                par.SortChildren((x, y) => string.CompareOrdinal(x.Name.ToLowerInvariant(), y.Name.ToLowerInvariant()));
 
-                    writerParameters.IncludeDots = false;
+                writerParameters.IncludeDots = false;
 
-                    Console.WriteLine("Creating PAR (this may take a while)... ");
-                    Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(pathToModPar)));
-                    par.TransformWith<ParArchiveWriter, ParArchiveWriterParameters>(writerParameters);
-                    par.Dispose();
-                }
+                Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(pathToModPar)));
+                par.TransformWith<ParArchiveWriter, ParArchiveWriterParameters>(writerParameters);
+                par.Dispose();
 
                 // TODO: Write .parmeta file here, using the containerNode
 
                 node.Dispose();
                 containerNode.Root.Dispose();
 
-                Console.WriteLine("DONE!");
-
                 // Remove the .partemp directory
                 Directory.Delete(pathToTempPar, true);
+
+                console.WriteLineIfVerbose();
+                console.WriteLine($"Repacked {fileDict.Count} file(s) in {parName + ".par"}!");
             }
+
+            return console;
         }
 
-        private static List<string> GetModFiles(string par, string mod)
+        private static List<string> GetModFiles(string par, string mod, ConsoleOutput console)
         {
             List<string> result;
-            if (mod.StartsWith("Parless_"))
+            if (mod.StartsWith(Constants.PARLESS_NAME))
             {
                 // Get index of ".parless" in par path
-                result = GetModFiles(Path.Combine(GamePath.GetDataPath(), par.Insert(int.Parse(mod.Substring(8)), ".parless")));
+                // 15 = ParlessMod.NAME.Length + 1
+                result = GetModFiles(Path.Combine(GamePath.GetDataPath(), par.Insert(int.Parse(mod.Substring(15)) - 1, ".parless")), console);
+            }
+            else
+            {
+                result = GetModFiles(GamePath.GetModPathFromDataPath(mod, par), console);
             }
 
-            result = GetModFiles(GamePath.GetModPathFromDataPath(mod, par));
-
             // Get file path relative to par
-            return result.Select(f => f.Substring(f.IndexOf(par) + par.Length + 1)).ToList();
+            return result.Select(f => f.Replace(".parless", "").Substring(f.Replace(".parless", "").IndexOf(par) + par.Length + 1)).ToList();
         }
 
-        private static List<string> GetModFiles(string path)
+        private static List<string> GetModFiles(string path, ConsoleOutput console)
         {
             List<string> files = new List<string>();
 
             // Add files in current directory
-            files.AddRange(Directory.GetFiles(path).Select(f => GamePath.GetDataPathFrom(f)));
+            foreach (string p in Directory.GetFiles(path).Select(f => GamePath.GetDataPathFrom(f)))
+            {
+                files.Add(p);
+                console.WriteLineIfVerbose($"Adding file: {p}");
+            }
 
             // Get files for all subdirectories
             foreach (string folder in Directory.GetDirectories(path))
             {
-                files.AddRange(GetModFiles(folder));
+                files.AddRange(GetModFiles(folder, console));
             }
 
             return files;

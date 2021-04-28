@@ -1,9 +1,5 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Utils;
 
@@ -11,14 +7,24 @@ namespace ModLoadOrder.Mods
 {
     public class ParlessMod : Mod
     {
-        public const string NAME = "Parless";
-
         public List<(string, int)> ParlessFolders { get; }
 
         public ParlessMod()
-            : base(NAME)
+            : base(Constants.PARLESS_NAME, 0)
         {
             this.ParlessFolders = new List<(string, int)>();
+        }
+
+        public new void PrintInfo()
+        {
+            this.console.WriteLineIfVerbose();
+
+            if (this.ParlessFolders.Count > 0)
+            {
+                this.console.WriteLine($"Added {this.ParlessFolders.Count} .parless path(s)");
+            }
+
+            base.PrintInfo();
         }
 
         /// <summary>
@@ -44,7 +50,10 @@ namespace ModLoadOrder.Mods
                 path = path.Remove(index, 8);
 
                 // Add .parless folders to the list to make it easier to check for them in the ASI
-                this.ParlessFolders.Add((GamePath.RemoveParlessPath(path), index - GamePath.GetDataPath().Length));
+                string loosePath = GamePath.RemoveParlessPath(path);
+                this.ParlessFolders.Add((loosePath, index - GamePath.GetDataPath().Length));
+
+                this.console.WriteLineIfVerbose($"Adding .parless path: {loosePath}");
             }
             else
             {

@@ -1,25 +1,34 @@
+using System;
+using System.IO;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using IniParser;
+using IniParser.Model;
+using Utils;
+
+using static ModLoadOrder.Generator;
+using static Utils.GamePath;
+using static Utils.Constants;
+
 namespace RyuCLI
 {
-    using System.Collections.Generic;
-    using System.IO;
-    using IniParser;
-    using IniParser.Model;
-
-    using static ModLoadOrder.Constants;
-    using static ModLoadOrder.Generator;
-    using static Utils.GamePath;
-
-    /// <summary>
-    /// Main program.
-    /// </summary>
-    internal static partial class Program
+    public static class Program
     {
-        // Will print info to console
-        private const bool VERBOSE = true;
+        private const string VERSION = "v1.0";
+        private const string AUTHOR = "SutandoTsukai181";
 
-        private static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             bool looseFilesEnabled = false;
+            bool checkForUpdates = true;
+
+            Console.WriteLine($"Ryu Mod Manager CLI {VERSION}");
+            Console.WriteLine($"By {AUTHOR}\n");
+
+            if (args.Length == 0)
+            {
+                Console.WriteLine($"No arguments were passed. Will generate Mod Load Order and repack pars...\n");
+            }
 
             if (File.Exists(INI))
             {
@@ -28,6 +37,11 @@ namespace RyuCLI
                 if (ini.TryGetKey("Overrides.LooseFilesEnabled", out string looseFiles))
                 {
                     looseFilesEnabled = int.Parse(looseFiles) == 1;
+                }
+
+                if (ini.TryGetKey("RyuModManager.Verbose", out string verbose))
+                {
+                    ConsoleOutput.Verbose = int.Parse(verbose) == 1;
                 }
             }
 
@@ -55,7 +69,11 @@ namespace RyuCLI
                 file.Close();
             }
 
-            GenerateModLoadOrder(mods, looseFilesEnabled, VERBOSE);
+            await GenerateModLoadOrder(mods, looseFilesEnabled).ConfigureAwait(false);
+
+            Console.WriteLine("Program finished. Press any key to exit...");
+            Console.ReadKey();
+        }
         }
     }
 }

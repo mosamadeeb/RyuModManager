@@ -53,7 +53,8 @@ namespace Utils
         {
             if (path.Contains(".parless"))
             {
-                return RemoveParlessPath(path);
+                // Preserve .parless in path instead of removing it
+                return path.Substring(path.IndexOf("data" + Path.DirectorySeparatorChar) + 4);
             }
 
             return RemoveModPath(path);
@@ -76,7 +77,7 @@ namespace Utils
 
         public static bool ExistsInDataAsPar(string path)
         {
-            if (GetBasename(path).EndsWith(".parless"))
+            if (path.Contains(".parless"))
             {
                 // Remove ".parless"
                 return FileExistsInData(RemoveParlessPath(path) + ".par");
