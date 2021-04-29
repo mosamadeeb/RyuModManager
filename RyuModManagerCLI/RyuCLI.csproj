@@ -8,6 +8,7 @@
     <PublishTrimmed>true</PublishTrimmed>
     <StartupObject>RyuCLI.Program</StartupObject>
     <AssemblyName>RyuModManagerCLI</AssemblyName>
+    <ApplicationIcon>rmm_icon_2.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>

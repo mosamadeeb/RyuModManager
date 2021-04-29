@@ -22,6 +22,8 @@ Thanks to [Kaplas](https://github.com/Kaplas80) for [ParLibrary](https://github.
 
 Thanks to [Pleonex](https://github.com/pleonex) for [Yarhl](https://github.com/SceneGate/Yarhl).
 
+Thanks to Kent#8218 for providing the icon.
+
 For the mod loader credits, please check the [YakuzaParless](https://github.com/SutandoTsukai181/YakuzaParless) repository.
 
 # License
