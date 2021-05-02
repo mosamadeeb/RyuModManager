@@ -106,7 +106,7 @@ namespace RyuCLI
                     Console.WriteLine("Unable to check for updates\n");
                 }
             }
-            if (isSilent == false)
+            if (!isSilent)
             {
             Console.WriteLine("Program finished. Press any key to exit...");
             Console.ReadKey();
