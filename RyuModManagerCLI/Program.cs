@@ -108,8 +108,8 @@ namespace RyuCLI
             }
             if (!isSilent)
             {
-            Console.WriteLine("Program finished. Press any key to exit...");
-            Console.ReadKey();
+                Console.WriteLine("Program finished. Press any key to exit...");
+                Console.ReadKey();
             }
         }
 
