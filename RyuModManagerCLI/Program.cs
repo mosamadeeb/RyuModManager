@@ -23,6 +23,7 @@ namespace RyuCLI
         {
             bool looseFilesEnabled = false;
             bool checkForUpdates = true;
+            bool isSilent = false;
 
             Console.WriteLine($"Ryu Mod Manager CLI {VERSION}");
             Console.WriteLine($"By {AUTHOR}\n");
@@ -30,6 +31,14 @@ namespace RyuCLI
             if (args.Length == 0)
             {
                 Console.WriteLine($"No arguments were passed. Will generate Mod Load Order and repack pars...\n");
+            }
+            else
+            {
+                List<string> list = new List<string>(args);
+                if (list.Contains("-s") || list.Contains("--silent"))
+                {
+                    isSilent = true;
+                }
             }
 
             Task<ConsoleOutput> updateCheck = Task.Run(() => CheckForUpdates());
@@ -97,9 +106,11 @@ namespace RyuCLI
                     Console.WriteLine("Unable to check for updates\n");
                 }
             }
-
-            Console.WriteLine("Program finished. Press any key to exit...");
-            Console.ReadKey();
+            if (!isSilent)
+            {
+                Console.WriteLine("Program finished. Press any key to exit...");
+                Console.ReadKey();
+            }
         }
 
         private static async Task<ConsoleOutput> CheckForUpdates()
