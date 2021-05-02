@@ -35,7 +35,7 @@ namespace RyuCLI
             else
             {
                 List<string> list = new List<string>(args);
-                if (list.Contains("/s"))
+                if (list.Contains("-s"))
                 {
                     isSilent = true;
                 }
