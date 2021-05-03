@@ -41,8 +41,6 @@ namespace RyuCLI
                 }
             }
 
-            Task<ConsoleOutput> updateCheck = Task.Run(() => CheckForUpdates());
-
             if (File.Exists(INI))
             {
                 IniData ini = new FileIniDataParser().ReadFile(INI);
@@ -61,6 +59,20 @@ namespace RyuCLI
                 {
                     checkForUpdates = int.Parse(check) == 1;
                 }
+            }
+
+            if (isSilent)
+            {
+                // No need to check if console won't be shown anyway
+                checkForUpdates = false;
+            }
+
+            Task<ConsoleOutput> updateCheck = null;
+
+            if (checkForUpdates)
+            {
+                // Start checking for updates before the actual generation is done
+                updateCheck = Task.Run(() => CheckForUpdates());
             }
 
             List<string> mods = new List<string>();
@@ -106,6 +118,7 @@ namespace RyuCLI
                     Console.WriteLine("Unable to check for updates\n");
                 }
             }
+
             if (!isSilent)
             {
                 Console.WriteLine("Program finished. Press any key to exit...");
