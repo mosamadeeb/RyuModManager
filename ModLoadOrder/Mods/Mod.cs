@@ -63,18 +63,20 @@ namespace ModLoadOrder.Mods
                 case "chara":
                 case "cse":
                 case "map_":
+                    needsRepack = GamePath.ExistsInDataAsPar(path);
+                    break;
                 case "prep":
                 case "light_anim":
-                    needsRepack = GamePath.ExistsInDataAsPar(path);
+                    needsRepack = GamePath.ExistsInDataAsPar(path) && GamePath.GetGame() < Game.Yakuza0;
                     break;
                 case "effect":
                     needsRepack = basename.StartsWith("effect_always");
                     break;
                 case "2dpar":
-                    needsRepack = basename.StartsWith("sprite_");
+                    needsRepack = basename.StartsWith("sprite") || basename.StartsWith("pjcm_");
                     break;
                 case "pausepar":
-                    needsRepack = !basename.StartsWith("pause_");
+                    needsRepack = !basename.StartsWith("pause");
                     break;
                 case "":
                     check = this.CheckFolder(basename);

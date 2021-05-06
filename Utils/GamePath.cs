@@ -12,6 +12,8 @@ namespace Utils
         public const string DATA = "data";
         public const string MODS = "mods";
 
+        private static Game? currentGame = null;
+
         public static string GetBasename(string path)
         {
             return Path.GetFileName(path.TrimEnd(Path.DirectorySeparatorChar));
@@ -89,15 +91,21 @@ namespace Utils
 
         public static Game GetGame()
         {
-            foreach (string file in Directory.GetFiles(GetGamePath(), "*.exe"))
+            if (!currentGame.HasValue)
             {
-                if (Enum.TryParse(Path.GetFileNameWithoutExtension(file), out Game game))
+                foreach (string file in Directory.GetFiles(GetGamePath(), "*.exe"))
                 {
-                    return game;
+                    if (Enum.TryParse(Path.GetFileNameWithoutExtension(file), out Game game))
+                    {
+                        currentGame = game;
+                        break;
+                    }
                 }
+
+                currentGame ??= Game.Unsupported;
             }
 
-            return Game.Unsupported;
+            return currentGame.Value;
         }
     }
 }
