@@ -77,16 +77,31 @@ namespace Utils
             return Directory.Exists(Path.Combine(GetDataPath(), path.TrimStart(Path.DirectorySeparatorChar)));
         }
 
+        public static string GetRootParPath(string path)
+        {
+            if (!path.Contains(Path.DirectorySeparatorChar))
+            {
+                return FileExistsInData(path) ? path : "";
+            }
+
+            if (FileExistsInData(path))
+            {
+                return path;
+            }
+
+            return GetRootParPath(path.Substring(0, path.LastIndexOf(Path.DirectorySeparatorChar)) + ".par");
+        }
+
         public static bool ExistsInDataAsPar(string path)
         {
             if (path.Contains(".parless"))
             {
                 // Remove ".parless"
-                return FileExistsInData(RemoveParlessPath(path) + ".par");
+                return GetRootParPath(RemoveParlessPath(path) + ".par") != "";
             }
 
             // Add ".par"
-            return FileExistsInData(RemoveModPath(path) + ".par");
+            return GetRootParPath(RemoveModPath(path) + ".par") != "";
         }
 
         public static Game GetGame()

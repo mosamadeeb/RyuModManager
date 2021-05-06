@@ -61,23 +61,39 @@ namespace ParRepacker
             }
         }
 
-        private static async Task<ConsoleOutput> RepackPar(string parName, List<string> mods, ConsoleOutput console)
+        private static async Task<ConsoleOutput> RepackPar(string parPath, List<string> mods, ConsoleOutput console)
         {
-            parName = parName.TrimStart(Path.DirectorySeparatorChar);
+            parPath = parPath.TrimStart(Path.DirectorySeparatorChar);
+            string parPathReal = GamePath.GetRootParPath(parPath + ".par");
 
-            string pathToPar = Path.Combine(GamePath.GetDataPath(), parName + ".par");
-            string pathToModPar = Path.Combine(GamePath.GetModsPath(), "Parless", parName + ".par");
+            string pathToPar = Path.Combine(GamePath.GetDataPath(), parPathReal);
+            string pathToModPar = Path.Combine(GamePath.GetModsPath(), "Parless", parPath + ".par");
             string pathToModParMeta = pathToModPar + "meta";
+
+            // Check if actual repackable par is nested
+            if (parPath + ".par" != parPathReal)
+            {
+                // -4 to skip ".par", +1 to skip the directory separator
+                parPathReal = parPath.Substring(parPathReal.Length - 4 + 1) + ".par";
+            }
+            else
+            {
+                // Add the directory separator to skip searching for the node
+                parPathReal = "/" + parPathReal;
+            }
+
+            // Replace directory separators to properly search for the node
+            parPathReal = parPathReal.Replace('\\', '/');
 
             // Dictionary of fileInPar, ModName
             Dictionary<string, string> fileDict = new Dictionary<string, string>();
 
-            console.WriteLine($"Repacking {parName + ".par"} ...");
+            console.WriteLine($"Repacking {parPath + ".par"} ...");
 
             // Populate fileDict with the files inside each mod
             foreach (string mod in mods)
             {
-                foreach (string modFile in GetModFiles(parName, mod, console))
+                foreach (string modFile in GetModFiles(parPath, mod, console))
                 {
                     fileDict.TryAdd(modFile, mod);
                 }
@@ -165,14 +181,14 @@ namespace ParRepacker
                     {
                         // 15 = ParlessMod.NAME.Length + 1
                         File.Copy(
-                            Path.Combine(GamePath.GetDataPath(), parName.Insert(int.Parse(fileModPair.Value.Substring(15)) - 1, ".parless"), fileModPair.Key),
+                            Path.Combine(GamePath.GetDataPath(), parPath.Insert(int.Parse(fileModPair.Value.Substring(15)) - 1, ".parless"), fileModPair.Key),
                             Path.Combine(pathToTempPar, fileModPair.Key),
                             true);
                     }
                     else
                     {
                         File.Copy(
-                            GamePath.GetModPathFromDataPath(fileModPair.Value, Path.Combine(parName, fileModPair.Key)),
+                            GamePath.GetModPathFromDataPath(fileModPair.Value, Path.Combine(parPath, fileModPair.Key)),
                             Path.Combine(pathToTempPar, fileModPair.Key),
                             true);
                     }
@@ -180,7 +196,7 @@ namespace ParRepacker
 
                 ParArchiveReaderParameters readerParameters = new ParArchiveReaderParameters
                 {
-                    Recursive = false,
+                    Recursive = true,
                 };
 
                 ParArchiveWriterParameters writerParameters = new ParArchiveWriterParameters
@@ -195,13 +211,29 @@ namespace ParRepacker
                 string nodeName = new DirectoryInfo(pathToTempPar).Name;
                 Node node = ReadDirectory(pathToTempPar, nodeName);
 
-                bool overwrite = false;
-
                 // Store a reference to the nodes in the container to dispose of them later, as they are not disposed properly
                 NodeContainerFormat containerNode = node.GetFormatAs<NodeContainerFormat>();
 
                 Node par = NodeFactory.FromFile(pathToPar, Yarhl.IO.FileOpenMode.Read);
                 par.TransformWith<ParArchiveReader, ParArchiveReaderParameters>(readerParameters);
+
+                if (par.Children[0].Name == ".")
+                {
+                    // Add dot node if it exists in the par.
+                    parPathReal = "./" + parPathReal;
+                }
+
+                Node temp;
+                Node searchResult = Navigator.SearchNode(par, parPathReal);
+
+                // Swap the search result and its parent
+                if (searchResult != null)
+                {
+                    temp = par;
+                    par = searchResult;
+                    searchResult = temp;
+                }
+
                 writerParameters.IncludeDots = par.Children[0].Name == ".";
 
                 node.GetFormatAs<NodeContainerFormat>().MoveChildrenTo(writerParameters.IncludeDots ? par.Children[0] : par, true);
@@ -213,6 +245,9 @@ namespace ParRepacker
                 par.TransformWith<ParArchiveWriter, ParArchiveWriterParameters>(writerParameters);
                 par.Dispose();
 
+                // Dispose of the parent nodes if they exist
+                searchResult?.Dispose();
+
                 // TODO: Write .parmeta file here, using the containerNode
 
                 node.Dispose();
@@ -222,7 +257,7 @@ namespace ParRepacker
                 Directory.Delete(pathToTempPar, true);
 
                 console.WriteLineIfVerbose();
-                console.WriteLine($"Repacked {fileDict.Count} file(s) in {parName + ".par"}!");
+                console.WriteLine($"Repacked {fileDict.Count} file(s) in {parPath + ".par"}!");
             }
 
             return console;
