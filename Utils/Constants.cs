@@ -14,8 +14,8 @@ namespace Utils
             "map_",
             "effect",
             "pausepar",
-            "2dpar",
-            "cse_",
+            "2d",
+            "cse",
             "prep",
             "light_anim",
         };

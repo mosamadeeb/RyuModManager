@@ -92,7 +92,7 @@ namespace Utils
             return GetRootParPath(path.Substring(0, path.LastIndexOf(Path.DirectorySeparatorChar)) + ".par");
         }
 
-        public static bool ExistsInDataAsPar(string path)
+        public static bool ExistsInDataAsParNested(string path)
         {
             if (path.Contains(".parless"))
             {
@@ -102,6 +102,18 @@ namespace Utils
 
             // Add ".par"
             return GetRootParPath(RemoveModPath(path) + ".par") != "";
+        }
+
+        public static bool ExistsInDataAsPar(string path)
+        {
+            if (path.Contains(".parless"))
+            {
+                // Remove ".parless"
+                return FileExistsInData(RemoveParlessPath(path) + ".par");
+            }
+
+            // Add ".par"
+            return FileExistsInData(RemoveModPath(path) + ".par");
         }
 
         public static Game GetGame()
