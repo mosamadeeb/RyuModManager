@@ -47,9 +47,9 @@ namespace ModLoadOrder
                         }
                     }
                 }
-            }
 
-            Console.WriteLine($"Done reading {Constants.PARLESS_NAME}\n");
+                Console.WriteLine($"Done reading {Constants.PARLESS_NAME}\n");
+            }
 
             Mod mod;
             Console.WriteLine("Reading mods...\n");

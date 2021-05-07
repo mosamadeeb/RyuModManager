@@ -6,6 +6,7 @@ using IniParser;
 using IniParser.Model;
 using Octokit;
 using Utils;
+using RyuCLI.Templates;
 
 using static ModLoadOrder.Generator;
 using static Utils.GamePath;
@@ -25,6 +26,9 @@ namespace RyuCLI
             bool checkForUpdates = true;
             bool isSilent = false;
 
+            var iniParser = new FileIniDataParser();
+            iniParser.Parser.Configuration.AssigmentSpacer = string.Empty;
+
             Console.WriteLine($"Ryu Mod Manager CLI {VERSION}");
             Console.WriteLine($"By {AUTHOR}\n");
 
@@ -43,7 +47,7 @@ namespace RyuCLI
 
             if (File.Exists(INI))
             {
-                IniData ini = new FileIniDataParser().ReadFile(INI);
+                IniData ini = iniParser.ReadFile(INI);
 
                 if (ini.TryGetKey("Overrides.LooseFilesEnabled", out string looseFiles))
                 {
@@ -59,6 +63,21 @@ namespace RyuCLI
                 {
                     checkForUpdates = int.Parse(check) == 1;
                 }
+
+                if (!ini.TryGetKey("Parless.IniVersion", out string iniVersion) || int.Parse(iniVersion) < ParlessIni.CurrentVersion)
+                {
+                    // Update if ini version is old (or does not exist)
+                    Console.Write(INI + " is outdated. Updating ini to the latest version... ");
+                    iniParser.WriteFile(INI, IniTemplate.UpdateIni(ini));
+                    Console.WriteLine("DONE!\n");
+                }
+            }
+            else
+            {
+                // Create ini if it does not exist
+                Console.Write(INI + " was not found. Creating default ini... ");
+                iniParser.WriteFile(INI, IniTemplate.NewIni());
+                Console.WriteLine("DONE!\n");
             }
 
             if (isSilent)
@@ -98,8 +117,22 @@ namespace RyuCLI
 
                 file.Close();
             }
+            else
+            {
+                // Create txt if it does not exist
+                Console.Write(TXT + " was not found. Creating empty txt... ");
+                File.WriteAllText(TXT, TxtTemplate.TxtContent);
+                Console.WriteLine("DONE!\n");
+            }
 
-            await GenerateModLoadOrder(mods, looseFilesEnabled).ConfigureAwait(false);
+            if (mods.Count > 0 || looseFilesEnabled)
+            {
+                await GenerateModLoadOrder(mods, looseFilesEnabled).ConfigureAwait(false);
+            }
+            else
+            {
+                Console.WriteLine("Aborting: No mods were found, and .parless paths are disabled\n");
+            }
 
             if (checkForUpdates)
             {
