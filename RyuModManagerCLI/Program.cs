@@ -16,7 +16,7 @@ namespace RyuCLI
 {
     public static class Program
     {
-        private const string VERSION = "v1.1";
+        private const string VERSION = "v1.2";
         private const string AUTHOR = "SutandoTsukai181";
         private const string REPO = "RyuModManager";
 
@@ -184,7 +184,7 @@ namespace RyuCLI
 
                 if (latestRelease != null && latestRelease.Name.Contains("CLI") && latestRelease.TagName != VERSION)
                 {
-                    console.WriteLine("New version detected!");
+                    console.WriteLine("New version detected!\n");
                     console.WriteLine($"Current version: {VERSION}");
                     console.WriteLine($"New version: {latestRelease.TagName}\n");
 
