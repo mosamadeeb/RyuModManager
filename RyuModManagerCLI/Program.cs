@@ -125,6 +125,14 @@ namespace RyuCLI
                 Console.WriteLine("DONE!\n");
             }
 
+            if (!Directory.Exists(MODS))
+            {
+                // Create mods folder if it does not exist
+                Console.Write($"\"{MODS}\" folder was not found. Creating empty folder... ");
+                Directory.CreateDirectory(MODS);
+                Console.WriteLine("DONE!\n");
+            }
+
             if (mods.Count > 0 || looseFilesEnabled)
             {
                 await GenerateModLoadOrder(mods, looseFilesEnabled).ConfigureAwait(false);
