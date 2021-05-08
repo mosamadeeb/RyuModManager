@@ -18,6 +18,7 @@ namespace Utils
             "cse",
             "prep",
             "light_anim",
+            "particle",
         };
     }
 }

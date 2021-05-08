@@ -28,23 +28,20 @@ namespace ModLoadOrder
 
             if (looseFilesEnabled)
             {
-                loose.AddFiles(GamePath.GetDataPath(), game >= Game.Yakuza6 ? "DE" : "");
+                loose.AddFiles(GamePath.GetDataPath(), "");
 
                 loose.PrintInfo();
 
-                if (game < Game.Yakuza6)
+                // Add all pars to the dictionary
+                foreach (string par in loose.ParFolders)
                 {
-                    // Add all pars to the dictionary
-                    foreach (string par in loose.ParFolders)
-                    {
-                        int index = par.IndexOf(".parless");
+                    int index = par.IndexOf(".parless");
 
-                        if (index != -1)
-                        {
-                            // Remove .parless from the par's path
-                            // Since .parless loose files are processed first, we can be sure that the dictionary won't have duplicates
-                            parDictionary.Add(par.Remove(index, 8), new List<string> { loose.Name + "_" + index });
-                        }
+                    if (index != -1)
+                    {
+                        // Remove .parless from the par's path
+                        // Since .parless loose files are processed first, we can be sure that the dictionary won't have duplicates
+                        parDictionary.Add(par.Remove(index, 8), new List<string> { loose.Name + "_" + index });
                     }
                 }
 
@@ -60,7 +57,7 @@ namespace ModLoadOrder
             for (int i = mods.Count - 1; i >= 0; i--)
             {
                 mod = new Mod(mods[i]);
-                mod.AddFiles(Path.Combine(GamePath.GetModsPath(), mods[i]), game >= Game.Yakuza6 ? "DE" : "");
+                mod.AddFiles(Path.Combine(GamePath.GetModsPath(), mods[i]), "");
 
                 mod.PrintInfo();
 
@@ -74,17 +71,14 @@ namespace ModLoadOrder
                     mods.RemoveAt(i);
                 }
 
-                if (game < Game.Yakuza6)
+                // Add all pars to the dictionary
+                foreach (string par in mod.ParFolders)
                 {
-                    // Add all pars to the dictionary
-                    foreach (string par in mod.ParFolders)
+                    // If a par is not in the dictionary, make a new list for it
+                    if (!parDictionary.TryAdd(par, new List<string> { mod.Name }))
                     {
-                        // If a par is not in the dictionary, make a new list for it
-                        if (!parDictionary.TryAdd(par, new List<string> { mod.Name }))
-                        {
-                            // Add the mod's name to the par's list
-                            parDictionary.GetValueOrDefault(par).Add(mod.Name);
-                        }
+                        // Add the mod's name to the par's list
+                        parDictionary.GetValueOrDefault(par).Add(mod.Name);
                     }
                 }
             }
@@ -122,11 +116,8 @@ namespace ModLoadOrder
                 }
             }
 
-            if (game < Game.Yakuza6)
-            {
-                // Repack pars
-                await Repacker.RepackDictionary(parDictionary).ConfigureAwait(false);
-            }
+            // Repack pars
+            await Repacker.RepackDictionary(parDictionary).ConfigureAwait(false);
         }
     }
 }

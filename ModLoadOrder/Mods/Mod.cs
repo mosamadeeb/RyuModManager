@@ -78,6 +78,15 @@ namespace ModLoadOrder.Mods
                 case "pausepar":
                     needsRepack = !basename.StartsWith("pause") && GamePath.ExistsInDataAsPar(path);
                     break;
+                case "particle":
+                    if (GamePath.GetGame() >= Game.Yakuza6 && basename == "arc")
+                    {
+                        check = "particle/arc";
+                    }
+                    break;
+                case "particle/arc":
+                    needsRepack = GamePath.ExistsInDataAsParNested(path);
+                    break;
                 case "":
                     check = this.CheckFolder(basename);
                     break;
