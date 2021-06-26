@@ -160,20 +160,29 @@ namespace ParRepacker
             Node par = NodeFactory.FromFile(pathToPar, Yarhl.IO.FileOpenMode.Read);
             par.TransformWith<ParArchiveReader, ParArchiveReaderParameters>(readerParameters);
 
-            Node temp;
-            Node searchResult = SearchParNode(par, parPathReal);
+            Node searchResult = null;
 
-            // Swap the search result and its parent
-            if (searchResult != null)
+            // Search for the par if it's not the actual loaded par
+            if (par.Name != new FileInfo(parPathReal).Name)
             {
-                temp = par;
+                searchResult = SearchParNode(par, parPathReal.ToLowerInvariant());
+
+                if (searchResult == null)
+                {
+                    // Create an empty node to transfer the children to
+                    searchResult = NodeFactory.CreateContainer("empty");
+                    searchResult.Add(NodeFactory.CreateContainer("."));
+                }
+
+                // Swap the search result and its parent
+                Node temp = par;
                 par = searchResult;
                 searchResult = temp;
             }
 
             writerParameters.IncludeDots = par.Children[0].Name == ".";
 
-            node.GetFormatAs<NodeContainerFormat>().MoveChildrenTo(writerParameters.IncludeDots ? par.Children[0] : par, true);
+            containerNode.MoveChildrenTo(writerParameters.IncludeDots ? par.Children[0] : par, true);
             par.SortChildren((x, y) => string.CompareOrdinal(x.Name.ToLowerInvariant(), y.Name.ToLowerInvariant()));
 
             writerParameters.IncludeDots = false;
