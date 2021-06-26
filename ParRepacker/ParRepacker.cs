@@ -68,7 +68,6 @@ namespace ParRepacker
 
             string pathToPar = Path.Combine(GamePath.GetDataPath(), parPathReal);
             string pathToModPar = Path.Combine(GamePath.GetModsPath(), "Parless", parPath + ".par");
-            string pathToModParMeta = pathToModPar + "meta";
 
             // Check if actual repackable par is nested
             if (parPath + ".par" != parPathReal)
@@ -101,55 +100,6 @@ namespace ParRepacker
 
             int fileCount = 0;
             bool needsRepack = false;
-
-            /*
-            if (!File.Exists(pathToModParMeta))
-            {
-                needsRepack = true;
-            }
-            else
-            {
-                FileStream parMetaStream = new FileStream(pathToModParMeta, FileMode.Open);
-
-                using Node parMeta = NodeFactory.FromFile(pathToModParMeta, Yarhl.IO.FileOpenMode.Read);
-                parMeta.TransformWith<ParArchiveReader>();
-
-                // Iterate on the nodes of the .parmeta
-                foreach (Node node in Navigator.IterateNodes(parMeta))
-                {
-                    var file = node.GetFormatAs<ParFile>();
-
-                    if (file != null)
-                    {
-                        // An actual file, not a folder node
-                        ++fileCount;
-
-                        if (fileDict.TryGetValue(node.Path, out string modName))
-                        {
-                            // Get the mod file's info to check the last modified date
-                            FileInfo info = new FileInfo(GamePath.GetModPathFromDataPath(modName, node.Path));
-                            info.Refresh();
-
-                            if (!info.Exists || !file.FileDate.Equals(info.LastWriteTime))
-                            {
-                                // Par file last modified date does not match the new file's date, so par should be repacked
-                                needsRepack = true;
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            // Par file does not exist in new list of files, so par should be repacked
-                            needsRepack = true;
-                            break;
-                        }
-                    }
-                }
-
-                // No need to await for stream to be closed
-                parMetaStream.DisposeAsync();
-            }
-            */
 
             needsRepack = true;
 
