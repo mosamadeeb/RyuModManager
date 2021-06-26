@@ -124,24 +124,26 @@ namespace ParRepacker
                     Directory.CreateDirectory(pathToTempPar);
                 }
 
+                string fileInModFolder;
+                string fileInTempFolder;
+
                 // Copy each file in the mods to the .partemp directory
                 foreach (KeyValuePair<string, string> fileModPair in fileDict)
                 {
                     if (fileModPair.Value.StartsWith(Constants.PARLESS_NAME))
                     {
                         // 15 = ParlessMod.NAME.Length + 1
-                        File.Copy(
-                            Path.Combine(GamePath.GetDataPath(), parPath.Insert(int.Parse(fileModPair.Value.Substring(15)) - 1, ".parless"), fileModPair.Key),
-                            Path.Combine(pathToTempPar, fileModPair.Key),
-                            true);
+                        fileInModFolder = Path.Combine(GamePath.GetDataPath(), parPath.Insert(int.Parse(fileModPair.Value.Substring(15)) - 1, ".parless"), fileModPair.Key);
                     }
                     else
                     {
-                        File.Copy(
-                            GamePath.GetModPathFromDataPath(fileModPair.Value, Path.Combine(parPath, fileModPair.Key)),
-                            Path.Combine(pathToTempPar, fileModPair.Key),
-                            true);
+                        fileInModFolder = GamePath.GetModPathFromDataPath(fileModPair.Value, Path.Combine(parPath, fileModPair.Key));
                     }
+
+                    fileInTempFolder = Path.Combine(pathToTempPar, fileModPair.Key);
+
+                    Directory.GetParent(fileInTempFolder).Create();
+                    File.Copy(fileInModFolder, fileInTempFolder, true);
                 }
 
                 ParArchiveReaderParameters readerParameters = new ParArchiveReaderParameters
