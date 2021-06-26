@@ -62,14 +62,12 @@ namespace ModLoadOrder.Mods
             {
                 case "chara":
                 case "map_":
+                case "effect":
                     needsRepack = GamePath.ExistsInDataAsPar(path);
                     break;
                 case "prep":
                 case "light_anim":
                     needsRepack = GamePath.GetGame() < Game.Yakuza0 && GamePath.ExistsInDataAsPar(path);
-                    break;
-                case "effect":
-                    needsRepack = basename.StartsWith("effect_always") && GamePath.ExistsInDataAsPar(path);
                     break;
                 case "2d":
                 case "cse":

@@ -25,7 +25,6 @@ namespace ParRepacker
                 Console.Write("Removing old pars...");
 
                 // Clean up the /mods/Parless/ directory before processing the dictionary
-                // TODO: If .parmeta checks are implemented, this should be changed
                 Directory.Delete(pathToParlessMods, true);
 
                 Console.WriteLine(" DONE!\n");
@@ -156,7 +155,6 @@ namespace ParRepacker
                     CompressorVersion = 0,
                     OutputPath = pathToModPar,
                     IncludeDots = true,
-
                 };
 
                 // Create a node from the .partemp directory and write the par to pathToModPar
@@ -199,8 +197,6 @@ namespace ParRepacker
 
                 // Dispose of the parent nodes if they exist
                 searchResult?.Dispose();
-
-                // TODO: Write .parmeta file here, using the containerNode
 
                 node.Dispose();
                 containerNode.Root.Dispose();
