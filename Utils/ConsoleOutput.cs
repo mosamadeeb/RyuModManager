@@ -6,6 +6,7 @@ namespace Utils
     public class ConsoleOutput
     {
         public static bool Verbose = false;
+        public static bool ShowWarnings = true;
         private static readonly List<string> printQueue = new List<string>();
 
         public int Id { get; }

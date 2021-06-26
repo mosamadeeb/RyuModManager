@@ -64,6 +64,11 @@ namespace RyuCLI
                     checkForUpdates = int.Parse(check) == 1;
                 }
 
+                if (ini.TryGetKey("RyuModManager.ShowWarnings", out string showWarnings))
+                {
+                    ConsoleOutput.ShowWarnings = int.Parse(showWarnings) == 1;
+                }
+
                 if (!ini.TryGetKey("Parless.IniVersion", out string iniVersion) || int.Parse(iniVersion) < ParlessIni.CurrentVersion)
                 {
                     // Update if ini version is old (or does not exist)

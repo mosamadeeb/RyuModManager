@@ -19,6 +19,9 @@ namespace ModLoadOrder
             List<int> modIndices = new List<int> { 0 };
             OrderedSet<string> files = new OrderedSet<string>();
 
+            // Dictionary of Mod, ListOfFolders
+            Dictionary<string, List<string>> modsWithFoldersNotFound = new Dictionary<string, List<string>>();
+
             // Dictionary of PathToPar, ListOfMods
             Dictionary<string, List<string>> parDictionary = new Dictionary<string, List<string>>();
 
@@ -49,6 +52,9 @@ namespace ModLoadOrder
             }
 
             Mod mod;
+            string modPath;
+            string subPathName;
+            List<string> foldersNotFound;
             Console.WriteLine("Reading mods...\n");
 
             // TODO: Make mod reading async
@@ -57,7 +63,8 @@ namespace ModLoadOrder
             for (int i = mods.Count - 1; i >= 0; i--)
             {
                 mod = new Mod(mods[i]);
-                mod.AddFiles(Path.Combine(GamePath.GetModsPath(), mods[i]), "");
+                modPath = Path.Combine(GamePath.GetModsPath(), mods[i]);
+                mod.AddFiles(modPath, "");
 
                 mod.PrintInfo();
 
@@ -80,6 +87,22 @@ namespace ModLoadOrder
                         // Add the mod's name to the par's list
                         parDictionary.GetValueOrDefault(par).Add(mod.Name);
                     }
+                }
+
+                // Check for folders which do not exist in the data path in the mod's root
+                foldersNotFound = new List<string>();
+                foreach (string subPath in Directory.GetDirectories(modPath))
+                {
+                    subPathName = new DirectoryInfo(subPath).Name;
+                    if (!(GamePath.DirectoryExistsInData(subPathName) || GamePath.FileExistsInData(subPathName + ".par")))
+                    {
+                        foldersNotFound.Add(subPathName);
+                    }
+                }
+
+                if (foldersNotFound.Count != 0)
+                {
+                    modsWithFoldersNotFound.Add(mod.Name, foldersNotFound);
                 }
             }
 
@@ -118,6 +141,24 @@ namespace ModLoadOrder
 
             // Repack pars
             await Repacker.RepackDictionary(parDictionary).ConfigureAwait(false);
+
+            if (ConsoleOutput.ShowWarnings)
+            {
+                foreach (string key in modsWithFoldersNotFound.Keys.ToList())
+                {
+                    Console.WriteLine($"Warning: Some folders in the root of \"{key}\" do not exist in the game's data. Check if the mod was extracted correctly.");
+
+                    if (ConsoleOutput.Verbose)
+                    {
+                        foreach (string folder in modsWithFoldersNotFound[key])
+                        {
+                            Console.WriteLine($"Folder not found: {folder}");
+                        }
+                    }
+
+                    Console.WriteLine();
+                }
+            }
         }
     }
 }

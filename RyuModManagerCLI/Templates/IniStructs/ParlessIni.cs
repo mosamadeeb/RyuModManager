@@ -4,7 +4,7 @@ namespace RyuCLI.Templates
 {
     public static class ParlessIni
     {
-        public const int CurrentVersion = 1;
+        public const int CurrentVersion = 2;
 
         public static List<IniSection> GetParlessSections()
         {
@@ -115,13 +115,19 @@ namespace RyuCLI.Templates
                         new IniKey
                         {
                             Name = "Verbose",
-                            Comments = new List<string> { "Print all file paths that get added to the MLO" },
+                            Comments = new List<string> { "Print additional info, including all file paths that get added to the MLO" },
                             DefaultValue = 0,
                         },
                         new IniKey
                         {
                             Name = "CheckForUpdates",
                             Comments = new List<string> { "Check for updates before exiting the program" },
+                            DefaultValue = 1,
+                        },
+                        new IniKey
+                        {
+                            Name = "ShowWarnings",
+                            Comments = new List<string> { "Show warnings whenever a mod was possibly not extracted correctly" },
                             DefaultValue = 1,
                         },
                     },
