@@ -167,14 +167,8 @@ namespace ParRepacker
                 Node par = NodeFactory.FromFile(pathToPar, Yarhl.IO.FileOpenMode.Read);
                 par.TransformWith<ParArchiveReader, ParArchiveReaderParameters>(readerParameters);
 
-                if (par.Children[0].Name == ".")
-                {
-                    // Add dot node if it exists in the par.
-                    parPathReal = "./" + parPathReal;
-                }
-
                 Node temp;
-                Node searchResult = Navigator.SearchNode(par, parPathReal);
+                Node searchResult = SearchParNode(par, parPathReal);
 
                 // Swap the search result and its parent
                 if (searchResult != null)
@@ -277,6 +271,45 @@ namespace ParRepacker
             }
 
             return container;
+        }
+
+        private static Node SearchParNode(Node node, string path)
+        {
+            string[] paths = path.Split(
+                new[] { NodeSystem.PathSeparator },
+                StringSplitOptions.RemoveEmptyEntries);
+
+            if (paths.Length == 0)
+            {
+                return null;
+            }
+
+            return SearchParNode(node, paths, 0);
+        }
+
+        private static Node SearchParNode(Node node, string[] paths, int pathIndex)
+        {
+            if (pathIndex < paths.Length)
+            {
+                string path = paths[pathIndex];
+
+                foreach (Node child in node.Children)
+                {
+                    if (child.Name == ".")
+                    {
+                        return SearchParNode(child, paths, pathIndex);
+                    }
+
+                    if (child.Name == path || child.Name == (path + ".par"))
+                    {
+                        return SearchParNode(child, paths, pathIndex + 1);
+                    }
+                }
+
+                return null;
+            }
+
+            return node;
         }
     }
 }

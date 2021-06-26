@@ -86,7 +86,12 @@ namespace ModLoadOrder.Mods
                     needsRepack = GamePath.ExistsInDataAsParNested(path);
                     break;
                 case "":
-                    check = this.CheckFolder(basename);
+                    needsRepack = (basename == "ptc" && GamePath.ExistsInDataAsParNested(path));
+
+                    if (!needsRepack)
+                    {
+                        check = this.CheckFolder(basename);
+                    }
                     break;
                 default:
                     break;
