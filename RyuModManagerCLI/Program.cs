@@ -164,6 +164,18 @@ namespace RyuCLI
                 Console.WriteLine("Aborting: No supported game was found in this directory\n");
             }
 
+            // TODO: Maybe move this to a separate "Game patches" file
+            // Virtua Fighter eSports crashes when used with dinput8.dll as the ASI loader
+            if (GamePath.GetGame() == Game.eve && File.Exists("dinput8.dll"))
+            {
+                Console.Write("Game specific patch: Renaming dinput8.dll to version.dll...");
+
+                // Rename dinput8.dll to version.dll to prevent the game from crashing
+                File.Move("dinput8.dll", "version.dll");
+
+                Console.WriteLine(" DONE!\n");
+            }
+
             if (checkForUpdates)
             {
                 Console.WriteLine("Checking for updates...");
