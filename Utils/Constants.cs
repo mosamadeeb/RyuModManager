@@ -19,6 +19,7 @@ namespace Utils
             "prep",
             "light_anim",
             "particle",
+            "stage",
         };
     }
 }

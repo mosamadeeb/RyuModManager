@@ -85,6 +85,9 @@ namespace ModLoadOrder.Mods
                 case "particle/arc":
                     needsRepack = GamePath.ExistsInDataAsParNested(path);
                     break;
+                case "stage":
+                    needsRepack = GamePath.GetGame() == Game.eve && basename == "sct" && GamePath.ExistsInDataAsParNested(path);
+                    break;
                 case "":
                     needsRepack = (basename == "ptc" && GamePath.ExistsInDataAsParNested(path))
                         || (basename == "entity_adam" && GamePath.ExistsInDataAsPar(path));
