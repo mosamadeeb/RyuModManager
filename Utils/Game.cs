@@ -16,6 +16,7 @@
         // Dragon Engine
         Yakuza6,
         YakuzaKiwami2,
-        YakuzaLikeADragon
+        YakuzaLikeADragon,
+        eve, // Virtua Fighter eSports
     }
 }
