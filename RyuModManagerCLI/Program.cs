@@ -140,6 +140,16 @@ namespace RyuCLI
                     Console.WriteLine("DONE!\n");
                 }
 
+                if (File.Exists(MLO))
+                {
+                    Console.Write("Removing old MLO...");
+
+                    // Remove existing MLO file to avoid it being used if a new MLO won't be generated
+                    File.Delete(MLO);
+
+                    Console.WriteLine(" DONE!\n");
+                }
+
                 if (mods.Count > 0 || looseFilesEnabled)
                 {
                     await GenerateModLoadOrder(mods, looseFilesEnabled).ConfigureAwait(false);
