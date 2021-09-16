@@ -16,7 +16,7 @@ namespace RyuCLI
 {
     public static class Program
     {
-        private const string VERSION = "v1.5";
+        private const string VERSION = "v1.6";
         private const string AUTHOR = "SutandoTsukai181";
         private const string REPO = "RyuModManager";
 
@@ -166,14 +166,36 @@ namespace RyuCLI
 
             // TODO: Maybe move this to a separate "Game patches" file
             // Virtua Fighter eSports crashes when used with dinput8.dll as the ASI loader
-            if (GamePath.GetGame() == Game.eve && File.Exists("dinput8.dll"))
+            if (GamePath.GetGame() == Game.eve && File.Exists(DINPUT8DLL))
             {
-                Console.Write("Game specific patch: Renaming dinput8.dll to version.dll...");
+                if (File.Exists(VERSIONDLL))
+                {
+                    Console.Write($"Game specific patch: Deleting {DINPUT8DLL} because {VERSIONDLL} exists...");
 
-                // Rename dinput8.dll to version.dll to prevent the game from crashing
-                File.Move("dinput8.dll", "version.dll");
+                    // Remove dinput8.dll
+                    File.Delete(DINPUT8DLL);
+                }
+                else
+                {
+                    Console.Write($"Game specific patch: Renaming {DINPUT8DLL} to {VERSIONDLL}...");
+
+                    // Rename dinput8.dll to version.dll to prevent the game from crashing
+                    File.Move(DINPUT8DLL, VERSIONDLL);
+                }
 
                 Console.WriteLine(" DONE!\n");
+            }
+
+            // Check if the ASI loader is not in the directory (possibly due to incorrect zip extraction)
+            if (!(File.Exists(DINPUT8DLL) || File.Exists(VERSIONDLL)))
+            {
+                Console.WriteLine($"Warning: \"{DINPUT8DLL}\" is missing from this directory. RyuModManager will NOT function properly without this file\n");
+            }
+
+            // Check if the ASI is not in the directory
+            if (!File.Exists(ASI))
+            {
+                Console.WriteLine($"Warning: \"{ASI}\" is missing from this directory. RyuModManager will NOT function properly without this file\n");
             }
 
             if (checkForUpdates)

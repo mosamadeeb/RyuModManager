@@ -7,6 +7,9 @@ namespace Utils
         public const string INI = "YakuzaParless.ini";
         public const string TXT = "ModLoadOrder.txt";
         public const string MLO = "YakuzaParless.mlo";
+        public const string ASI = "YakuzaParless.asi";
+        public const string DINPUT8DLL = "dinput8.dll";
+        public const string VERSIONDLL = "version.dll";
         public const string PARLESS_NAME = ".parless paths";
 
         public static readonly List<string> IncompatiblePars = new List<string> {
