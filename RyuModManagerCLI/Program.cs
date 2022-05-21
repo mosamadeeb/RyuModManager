@@ -202,6 +202,15 @@ namespace RyuCLI
                 Console.WriteLine($"Warning: \"{ASI}\" is missing from this directory. RyuModManager will NOT function properly without this file\n");
             }
 
+            // Calculate the checksum for the game's exe to inform the user if their version might be unsupported
+            if (ConsoleOutput.ShowWarnings && GetGame() != Game.Unsupported && !GameHash.ValidateFile(Path.Combine(GetGamePath(), GetGameExe()), GetGame()))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Warning: Game version is unsupported. Please use the latest Steam version of the game.");
+                Console.WriteLine($"RyuModManager will still generate the load order, but the game might CRASH or not function properly\n");
+                Console.ResetColor();
+            }
+
             if (checkForUpdates)
             {
                 Console.WriteLine("Checking for updates...");

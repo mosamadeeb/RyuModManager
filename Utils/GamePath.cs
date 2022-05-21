@@ -134,5 +134,10 @@ namespace Utils
 
             return currentGame.Value;
         }
+
+        public static string GetGameExe()
+        {
+            return currentGame.ToString() + ".exe";
+        }
     }
 }
