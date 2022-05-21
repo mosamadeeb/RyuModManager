@@ -7,6 +7,7 @@ using IniParser.Model;
 using Octokit;
 using Utils;
 using RyuCLI.Templates;
+using ParRepacker;
 
 using static ModLoadOrder.Generator;
 using static Utils.GamePath;
@@ -149,6 +150,9 @@ namespace RyuCLI
 
                     Console.WriteLine(" DONE!\n");
                 }
+
+                // Remove previously repacked pars, to avoid unwanted side effects
+                Repacker.RemoveOldRepackedPars();
 
                 if (mods.Count > 0 || looseFilesEnabled)
                 {

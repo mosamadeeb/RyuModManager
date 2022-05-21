@@ -14,21 +14,24 @@ namespace ParRepacker
     public static class Repacker
     {
 
-        public static async Task RepackDictionary(Dictionary<string, List<string>> parDictionary)
+        public static void RemoveOldRepackedPars()
         {
-            var parTasks = new List<Task<ConsoleOutput>>();
-
             string pathToParlessMods = Path.Combine(GamePath.GetModsPath(), "Parless");
 
             if (Directory.Exists(pathToParlessMods))
             {
                 Console.Write("Removing old pars...");
-
-                // Clean up the /mods/Parless/ directory before processing the dictionary
                 Directory.Delete(pathToParlessMods, true);
-
                 Console.WriteLine(" DONE!\n");
             }
+        }
+
+        public static async Task RepackDictionary(Dictionary<string, List<string>> parDictionary)
+        {
+            var parTasks = new List<Task<ConsoleOutput>>();
+
+            // Clean up the /mods/Parless/ directory before processing the dictionary
+            RemoveOldRepackedPars();
 
             if (parDictionary.Count == 0)
             {
