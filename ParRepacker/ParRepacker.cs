@@ -232,7 +232,7 @@ namespace ParRepacker
             List<string> files = new List<string>();
 
             // Add files in current directory
-            foreach (string p in Directory.GetFiles(path).Select(f => GamePath.GetDataPathFrom(f)))
+            foreach (string p in Directory.GetFiles(path).Where(f => !f.EndsWith(Constants.VORTEX_MANAGED_FILE)).Select(f => GamePath.GetDataPathFrom(f)))
             {
                 files.Add(p);
                 console.WriteLineIfVerbose($"Adding file: {p}");
