@@ -89,7 +89,7 @@ namespace RyuCLI.Templates
                                 "and should help users avoid mistakenly not rebuilding.",
                                 "Optional QOL feature to help you avoid having to re-run the mod manager every time.",
                             },
-                            DefaultValue = 0,
+                            DefaultValue = 1,
                         },
                         new IniKey
                         {
