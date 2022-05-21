@@ -34,6 +34,11 @@ namespace Utils
             return Path.Combine(GetGamePath(), MODS);
         }
 
+        public static string GetExternalModsPath()
+        {
+            return Path.Combine(GetModsPath(), Constants.EXTERNAL_MODS);
+        }
+
         /// <summary>
         /// 
         /// </summary>

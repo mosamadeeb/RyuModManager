@@ -23,6 +23,7 @@ namespace RyuCLI
 
         public static async Task Main(string[] args)
         {
+            bool externalModsOnly = true;
             bool looseFilesEnabled = false;
             bool checkForUpdates = true;
             bool isSilent = false;
@@ -70,6 +71,11 @@ namespace RyuCLI
                     ConsoleOutput.ShowWarnings = int.Parse(showWarnings) == 1;
                 }
 
+                if (ini.TryGetKey("RyuModManager.LoadExternalModsOnly", out string extMods))
+                {
+                    externalModsOnly = int.Parse(showWarnings) == 1;
+                }
+
                 if (!ini.TryGetKey("Parless.IniVersion", out string iniVersion) || int.Parse(iniVersion) < ParlessIni.CurrentVersion)
                 {
                     // Update if ini version is old (or does not exist)
@@ -102,7 +108,12 @@ namespace RyuCLI
 
             List<string> mods = new List<string>();
 
-            if (File.Exists(TXT))
+            if (externalModsOnly && Directory.Exists(GetExternalModsPath()))
+            {
+                // Only load the files inside the external mods path, and ignore the load order in the txt
+                mods.Add(EXTERNAL_MODS);
+            }
+            else if (File.Exists(TXT))
             {
                 StreamReader file = new StreamReader(new FileInfo(TXT).FullName);
 

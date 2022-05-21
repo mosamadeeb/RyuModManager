@@ -4,7 +4,7 @@ namespace RyuCLI.Templates
 {
     public static class ParlessIni
     {
-        public const int CurrentVersion = 2;
+        public const int CurrentVersion = 3;
 
         public static List<IniSection> GetParlessSections()
         {
@@ -128,6 +128,18 @@ namespace RyuCLI.Templates
                         {
                             Name = "ShowWarnings",
                             Comments = new List<string> { "Show warnings whenever a mod was possibly not extracted correctly" },
+                            DefaultValue = 1,
+                        },
+                        new IniKey
+                        {
+                            Name = "LoadExternalModsOnly",
+                            Comments = new List<string>
+                            {
+                                "Only load mods from the /mods/_externalMods/ directory, and ignore the load order file.",
+                                "That directory will be created automatically by external mod managers.",
+                                "If this option is disabled, external mods will NOT be loaded, unless \"_externalMods\" is added manually to the load order file.",
+                                "If the directory does not exist, then the load order will be used as normal.",
+                            },
                             DefaultValue = 1,
                         },
                     },

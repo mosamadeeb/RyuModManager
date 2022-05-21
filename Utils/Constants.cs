@@ -11,6 +11,7 @@ namespace Utils
         public const string DINPUT8DLL = "dinput8.dll";
         public const string VERSIONDLL = "version.dll";
         public const string PARLESS_NAME = ".parless paths";
+        public const string EXTERNAL_MODS = "_externalMods";
         public const string VORTEX_MANAGED_FILE = "__folder_managed_by_vortex";
 
         public static readonly List<string> IncompatiblePars = new List<string> {
