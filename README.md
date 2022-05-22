@@ -9,6 +9,8 @@ Repacking is needed only for some PAR archives in Old Engine games (Yakuza games
 Unpack the [latest release](../../releases/latest) into the game's directory, in the same folder as the game's executable.
 
 # Usage
+Starting from version v1.7, RyuModManager is now supported in [Vortex](https://www.nexusmods.com/about/vortex/)! This allows using the **Mod Manager Download** button on Nexus Mods to make downloading mods a simpler process. Please check the [Vortex support plugins](https://github.com/SutandoTsukai181/vortex_mo2_yakuza_plugins) repo for more info. You still have to install RyuModManager in order to use Vortex support.
+
 For actual usage, check the [Installing Mods](../../wiki/Installing-Mods) and [Creating A New Mod](../../wiki/Creating-A-New-Mod) articles in the [wiki](../../wiki).
 
 To run the program, just launch it with no arguments and it will generate an MLO file to be used by [Parless](https://github.com/SutandoTsukai181/YakuzaParless), the Yakuza mod loader.
