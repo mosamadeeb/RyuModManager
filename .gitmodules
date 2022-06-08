@@ -1,3 +1,4 @@
 [submodule "ParManager"]
 	path = ParManager
-	url = https://github.com/Kaplas80/ParManager.git
+	url = https://github.com/SutandoTsukai181/ParManager.git
+	branch = netstandard2.0
