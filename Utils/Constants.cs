@@ -5,7 +5,8 @@ namespace Utils
     public static class Constants
     {
         public const string INI = "YakuzaParless.ini";
-        public const string TXT = "ModLoadOrder.txt";
+        public const string TXT = "ModList.txt";
+        public const string TXT_OLD = "ModLoadOrder.txt";
         public const string MLO = "YakuzaParless.mlo";
         public const string ASI = "YakuzaParless.asi";
         public const string DINPUT8DLL = "dinput8.dll";

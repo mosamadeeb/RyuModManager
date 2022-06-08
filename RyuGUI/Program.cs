@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.Runtime.InteropServices;
-using System.Text;
-using RyuCLI;
 
 namespace RyuGUI
 {
@@ -27,7 +24,7 @@ namespace RyuGUI
             else
             {
                 AllocConsole();
-                RyuCLI.Program.Main(args).ConfigureAwait(true);
+                RyuCLI.Program.Main(args).Wait();
                 FreeConsole();
             }
         }
