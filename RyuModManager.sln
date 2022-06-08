@@ -14,7 +14,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ParRepacker", "ParRepacker\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModLoadOrder", "ModLoadOrder\ModLoadOrder.csproj", "{C9439EA3-3BE6-45D4-9A5B-FF7E8EBDFA2B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utils", "Utils\Utils.csproj", "{A1A0AE14-3F2F-4213-B22F-6EC20F2BFE0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utils", "Utils\Utils.csproj", "{A1A0AE14-3F2F-4213-B22F-6EC20F2BFE0D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RyuGUI", "RyuGUI\RyuGUI.csproj", "{86DD46D2-E68A-4D1B-A339-48C99A916652}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DD6F4A69-AC5E-4D9D-858A-C269F1A266F1} = {DD6F4A69-AC5E-4D9D-858A-C269F1A266F1}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,6 +47,10 @@ Global
 		{A1A0AE14-3F2F-4213-B22F-6EC20F2BFE0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1A0AE14-3F2F-4213-B22F-6EC20F2BFE0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1A0AE14-3F2F-4213-B22F-6EC20F2BFE0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86DD46D2-E68A-4D1B-A339-48C99A916652}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86DD46D2-E68A-4D1B-A339-48C99A916652}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86DD46D2-E68A-4D1B-A339-48C99A916652}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86DD46D2-E68A-4D1B-A339-48C99A916652}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

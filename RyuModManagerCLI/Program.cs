@@ -120,9 +120,9 @@ namespace RyuCLI
                 string line;
                 while ((line = file.ReadLine()) != null)
                 {
-                    if (!line.StartsWith(';'))
+                    if (!line.StartsWith(";"))
                     {
-                        line = line.Split(';', 1)[0];
+                        line = line.Split(new char[] { ';' }, 1)[0];
 
                         // Only add existing mods that are not duplicates
                         if (line.Length > 0 && Directory.Exists(Path.Combine(MODS, line)) && !mods.Contains(line))

@@ -81,11 +81,16 @@ namespace ModLoadOrder
                 // Add all pars to the dictionary
                 foreach (string par in mod.ParFolders)
                 {
-                    // If a par is not in the dictionary, make a new list for it
-                    if (!parDictionary.TryAdd(par, new List<string> { mod.Name }))
+                    List<string> list;
+                    if (parDictionary.TryGetValue(par, out list))
                     {
                         // Add the mod's name to the par's list
-                        parDictionary.GetValueOrDefault(par).Add(mod.Name);
+                        list.Add(mod.Name);
+                    }
+                    else
+                    {
+                        // If a par is not in the dictionary, make a new list for it
+                        parDictionary.Add(par, new List<string> { mod.Name });
                     }
                 }
 
