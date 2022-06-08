@@ -73,7 +73,7 @@ namespace RyuCLI
 
                 if (ini.TryGetKey("RyuModManager.LoadExternalModsOnly", out string extMods))
                 {
-                    externalModsOnly = int.Parse(showWarnings) == 1;
+                    externalModsOnly = int.Parse(extMods) == 1;
                 }
 
                 if (!ini.TryGetKey("Parless.IniVersion", out string iniVersion) || int.Parse(iniVersion) < ParlessIni.CurrentVersion)
