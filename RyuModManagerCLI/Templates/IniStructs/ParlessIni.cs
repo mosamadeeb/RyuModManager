@@ -4,7 +4,7 @@ namespace RyuCLI.Templates
 {
     public static class ParlessIni
     {
-        public const int CurrentVersion = 3;
+        public const int CurrentVersion = 4;
 
         public static List<IniSection> GetParlessSections()
         {

@@ -80,6 +80,13 @@ namespace RyuCLI
                 {
                     // Update if ini version is old (or does not exist)
                     Console.Write(INI + " is outdated. Updating ini to the latest version... ");
+
+                    if (int.Parse(iniVersion) <= 3)
+                    {
+                        // Force enable RebuildMLO option
+                        ini.Sections["Overrides"]["RebuildMLO"] = "1";
+                    }
+
                     iniParser.WriteFile(INI, IniTemplate.UpdateIni(ini));
                     Console.WriteLine("DONE!\n");
                 }
