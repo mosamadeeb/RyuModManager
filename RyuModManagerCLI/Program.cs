@@ -402,11 +402,11 @@ namespace RyuCLI
                 var client = new GitHubClient(new ProductHeaderValue(REPO));
                 var latestRelease = await client.Repository.Release.GetLatest(AUTHOR, REPO).ConfigureAwait(false);
 
-                if (latestRelease != null && latestRelease.Name.Contains("CLI") && latestRelease.TagName != VERSION)
+                if (latestRelease != null && latestRelease.Name.Contains("Ryu Mod Manager") && latestRelease.TagName != VERSION)
                 {
                     console.WriteLine("New version detected!\n");
                     console.WriteLine($"Current version: {VERSION}");
-                    console.WriteLine($"New version: {latestRelease.TagName}\n");
+                    console.WriteLine($"Latest version: {latestRelease.TagName}\n");
 
                     console.WriteLine($"Please update by going to {latestRelease.HtmlUrl}");
                 }
