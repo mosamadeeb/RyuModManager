@@ -19,7 +19,7 @@ namespace RyuCLI
 {
     public static class Program
     {
-        public const string VERSION = "v1.7";
+        public const string VERSION = "v2.0";
         public const string AUTHOR = "SutandoTsukai181";
         public const string REPO = "RyuModManager";
 
