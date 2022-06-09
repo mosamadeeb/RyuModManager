@@ -27,6 +27,7 @@ namespace RyuCLI
         private static bool looseFilesEnabled = false;
         private static bool checkForUpdates = true;
         private static bool isSilent = false;
+        private static bool migrated = false;
 
         private static Task<ConsoleOutput> updateCheck = null;
 
@@ -173,28 +174,15 @@ namespace RyuCLI
                     // Scanned mods should be disabled, because that's how they were with the old txt format
                     defaultEnabled = false;
 
-                    Console.Write("Old format load order file (" + TXT_OLD + ") was found. Importing to the new format...");
+                    // Set a flag so we can delete the old file after we actually save the mod list
+                    migrated = true;
 
                     // Migrate old format to new
+                    Console.Write("Old format load order file (" + TXT_OLD + ") was found. Importing to the new format...");
                     mods.AddRange(ConvertOldToNewModList(ReadModLoadOrderTxt(TXT_OLD)).Where(n => !mods.Any(m => m.Name == n.Name)));
-
-                    ini.Sections.AddSection("SavedSettings");
-                    ini["SavedSettings"].AddKey("ModListImported", "true");
-                    iniParser.WriteFile(INI, ini);
-
                     Console.WriteLine(" DONE!\n");
-
-                    try
-                    {
-                        File.Delete(TXT_OLD);
-                    }
-                    catch
-                    {
-                        Console.WriteLine("Could not delete " + TXT_OLD + ". This file should be deleted manually.");
-                    }
                 }
-
-                if (File.Exists(TXT))
+                else if (File.Exists(TXT))
                 {
                     mods.AddRange(ReadModListTxt(TXT).Where(n => !mods.Any(m => m.Name == n.Name)));
                 }
@@ -391,7 +379,34 @@ namespace RyuCLI
             return mods;
         }
 
-        public static bool WriteModListTxt(List<ModInfo> mods)
+        public static bool SaveModList(List<ModInfo> mods)
+        {
+            bool result = WriteModListTxt(mods);
+
+            if (migrated)
+            {
+                try
+                {
+                    File.Delete(TXT_OLD);
+
+                    var iniParser = new FileIniDataParser();
+                    iniParser.Parser.Configuration.AssigmentSpacer = string.Empty;
+
+                    IniData ini = iniParser.ReadFile(INI);
+                    ini.Sections.AddSection("SavedSettings");
+                    ini["SavedSettings"].AddKey("ModListImported", "true");
+                    iniParser.WriteFile(INI, ini);
+                }
+                catch
+                {
+                    Console.WriteLine("Could not delete " + TXT_OLD + ". This file should be deleted manually.");
+                }
+            }
+
+            return result;
+        }
+
+        private static bool WriteModListTxt(List<ModInfo> mods)
         {
             // No need to write the file if it's going to be empty
             if (mods?.Count > 0)

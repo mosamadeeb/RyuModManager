@@ -103,7 +103,7 @@ namespace RyuGUI
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            if (RyuCLI.Program.WriteModListTxt(this.ModList.ToList()))
+            if (RyuCLI.Program.SaveModList(this.ModList.ToList()))
             {
                 // Run generation only if it will not be run on game launch (i.e. if RebuildMLO is disabled)
                 if (RyuCLI.Program.RebuildMLO)
