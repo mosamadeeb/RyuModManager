@@ -166,8 +166,13 @@ namespace RyuCLI
             }
             else
             {
+                bool defaultEnabled = true;
+
                 if (File.Exists(TXT_OLD) && ini.GetKey("SavedSettings.ModListImported") == null)
                 {
+                    // Scanned mods should be disabled, because that's how they were with the old txt format
+                    defaultEnabled = false;
+
                     Console.Write("Old format load order file (" + TXT_OLD + ") was found. Importing to the new format...");
 
                     // Migrate old format to new
@@ -177,7 +182,7 @@ namespace RyuCLI
                     ini["SavedSettings"].AddKey("ModListImported", "true");
                     iniParser.WriteFile(INI, ini);
 
-                    Console.WriteLine("DONE!\n");
+                    Console.WriteLine(" DONE!\n");
 
                     try
                     {
@@ -201,7 +206,9 @@ namespace RyuCLI
                 if (Directory.Exists(MODS))
                 {
                     // Add all scanned mods that have not been added to the load order yet
-                    mods.AddRange(ScanMods().Where(n => !mods.Any(m => m.Name == n)).Select(m => new ModInfo(m)));
+                    Console.Write("Scanning for mods...");
+                    mods.AddRange(ScanMods().Where(n => !mods.Any(m => m.Name == n)).Select(m => new ModInfo(m, defaultEnabled)));
+                    Console.WriteLine(" DONE!\n");
                 }
             }
 
