@@ -106,14 +106,12 @@ namespace RyuGUI
             if (RyuCLI.Program.WriteModListTxt(this.ModList.ToList()))
             {
                 // Run generation only if it will not be run on game launch (i.e. if RebuildMLO is disabled)
-                if (!RyuCLI.Program.RebuildMLO)
+                if (RyuCLI.Program.RebuildMLO)
                 {
                     MessageBox.Show("Mod list was saved. Mods will be applied next time the game is run.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
-                    //MessageBox.Show("Applying mods. Please wait...", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
-
                     // Open MessageBox on a separate thread
                     Task.Run(() => MessageBox.Show("Applying mods. Please wait...", "Info", MessageBoxButton.OK, MessageBoxImage.Information));
 
