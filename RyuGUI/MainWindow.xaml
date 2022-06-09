@@ -11,7 +11,7 @@
             <ColumnDefinition Width="350*" MaxWidth="350"/>
             <ColumnDefinition Width="100*"/>
         </Grid.ColumnDefinitions>
-        <ListView x:Name="ModListView" ItemsSource="{Binding ModList, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" Margin="25,25,25,95" Background="#FF4B4B4B" Foreground="White" Opacity="0.8">
+        <ListView x:Name="ModListView" ItemsSource="{Binding ModList, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" Margin="25,25,24.6,0" Background="#FF4B4B4B" Foreground="White" Opacity="0.8" Height="418" VerticalAlignment="Top">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Enabled" Width="50">
