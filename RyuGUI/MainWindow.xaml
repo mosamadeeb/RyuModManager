@@ -5,8 +5,56 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RyuGUI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Ryu Mod Manager" Height="568" Width="456" ResizeMode="NoResize" Background="#FF373535" Foreground="White" SizeToContent="WidthAndHeight">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="350*" MaxWidth="350"/>
+            <ColumnDefinition Width="100*"/>
+        </Grid.ColumnDefinitions>
+        <ListView x:Name="ModListView" ItemsSource="{Binding ModList, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" Margin="25,25,25,95" Background="#FF4B4B4B" Foreground="White" Opacity="0.8">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Enabled" Width="50">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox Margin="5, 0" IsChecked="{Binding Enabled}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Mod Name" Width="200">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Margin="5, 0" Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="true" >
+                            <Setter Property="Foreground" Value="#FFFFFFFF" />
+                            <Setter Property="Background" Value="#FF4B4B4B" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="#FFFFFFFF" />
+                            <Setter Property="Background" Value="#FF4B4B4B" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.ItemContainerStyle>
+        </ListView>
+        <Grid Margin="75,475,74.6,23.4">
+            <Button Content="Save" Click="SaveButton_Click" Height="40" VerticalAlignment="Top" BorderThickness="3" BorderBrush="#FF58F028" Opacity="0.8" Background="#FF4B4B4B" Foreground="White" Margin="0,0,125,0" Padding="10"/>
+            <Button Content="Close" Click="CloseButton_Click" Height="40" VerticalAlignment="Top" BorderThickness="3" BorderBrush="#FFFC5555" Opacity="0.8" Background="#FF4B4B4B" Foreground="White" Margin="125,0,0,0" Padding="10"/>
+        </Grid>
+        <Grid Grid.Column="1" Margin="10,80,20,238.4" Height="200" Width="70" MaxWidth="70" MaxHeight="200">
+            <Button Content="Toggle" Margin="7,0,8,160" Width="50" Click="ToggleButton_Click" Opacity="0.8" Foreground="White" Background="#FF4B4B4B" BorderThickness="2"/>
+            <Button Content="Up" Margin="0,80" Width="50" Click="UpButton_Click" Opacity="0.8" Background="#FF4B4B4B" Foreground="White" BorderThickness="2"/>
+            <Button Content="Down" Margin="0,160,0,0" Width="50" Click="DownButton_Click" Opacity="0.785" Background="#FF4B4B4B" Foreground="White" BorderThickness="2"/>
+
+        </Grid>
 
     </Grid>
 </Window>

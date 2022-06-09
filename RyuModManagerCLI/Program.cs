@@ -129,7 +129,7 @@ namespace RyuCLI
 
             List<ModInfo> mods = new List<ModInfo>();
 
-            if (externalModsOnly && Directory.Exists(GetExternalModsPath()))
+            if (ShouldBeExternalOnly())
             {
                 // Only load the files inside the external mods path, and ignore the load order in the txt
                 mods.Add(new ModInfo(EXTERNAL_MODS));
@@ -351,7 +351,7 @@ namespace RyuCLI
             return mods;
         }
 
-        public static void WriteModListTxt(List<ModInfo> mods)
+        public static bool WriteModListTxt(List<ModInfo> mods)
         {
             // No need to write the file if it's going to be empty
             if (mods?.Count > 0)
@@ -364,7 +364,11 @@ namespace RyuCLI
                 }
 
                 File.WriteAllText(TXT, content.Substring(1));
+
+                return true;
             }
+
+            return false;
         }
 
         public static List<ModInfo> ConvertOldToNewModList(List<string> mods)
@@ -377,12 +381,17 @@ namespace RyuCLI
             return mods.Select(m => m.Name).ToList();
         }
 
+        public static bool ShouldBeExternalOnly()
+        {
+            return externalModsOnly && Directory.Exists(GetExternalModsPath());
+        }
+
         private static List<string> ScanMods()
         {
-            List<string> mods = Directory.GetDirectories(GetModsPath()).Select(d => Path.GetFileName(d.TrimEnd(new char[] { Path.DirectorySeparatorChar }))).ToList();
-            mods.RemoveAll(m => (m == "Parless") || (m == EXTERNAL_MODS));
-
-            return mods;
+            return Directory.GetDirectories(GetModsPath())
+                .Select(d => Path.GetFileName(d.TrimEnd(new char[] { Path.DirectorySeparatorChar })))
+                .Where(m => (m != "Parless") && (m != EXTERNAL_MODS))
+                .ToList();
         }
 
         private static async Task<ConsoleOutput> CheckForUpdates()
