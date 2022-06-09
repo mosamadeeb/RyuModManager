@@ -139,7 +139,7 @@ namespace RyuCLI
                 Console.Write("Old format load order file (" + TXT_OLD + ") was found. Importing to the new format...");
 
                 // Migrate old format to new
-                mods.AddRange(ConvertOldToNewModList(ReadModLoadOrderTxt(TXT_OLD)));
+                mods.AddRange(ConvertOldToNewModList(ReadModLoadOrderTxt(TXT_OLD)).Where(m => !mods.Contains(m)));
 
                 ini.Sections.AddSection("SavedSettings");
                 ini["SavedSettings"].AddKey("ModListImported", "true");
@@ -158,7 +158,7 @@ namespace RyuCLI
             }
             else if (File.Exists(TXT))
             {
-                mods.AddRange(ReadModListTxt(TXT));
+                mods.AddRange(ReadModListTxt(TXT).Where(m => !mods.Contains(m)));
             }
             else
             {
@@ -168,7 +168,7 @@ namespace RyuCLI
             if (Directory.Exists(MODS))
             {
                 // Add all scanned mods that have not been added to the load order yet
-                mods.AddRange(ScanMods().Where(n => mods.Any(m => m.Name == n)).Select(m => new ModInfo(m)));
+                mods.AddRange(ScanMods().Where(n => !mods.Any(m => m.Name == n)).Select(m => new ModInfo(m)));
             }
 
             return mods;
@@ -338,7 +338,7 @@ namespace RyuCLI
                     {
                         ModInfo info = new ModInfo(mod.Substring(1), mod[0] == '<');
 
-                        if (ModInfo.IsValid(info))
+                        if (ModInfo.IsValid(info) && !mods.Contains(info))
                         {
                             mods.Add(info);
                         }
