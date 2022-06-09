@@ -33,15 +33,7 @@ namespace RyuGUI
 
         public void SetupModList(List<ModInfo> mods)
         {
-            if (mods.Count > 0)
-            {
-                this.ModList = new ObservableCollection<ModInfo>(mods);
-            }
-            else
-            {
-                MessageBox.Show("No mods were found. Add some mods to the \"\\mods\\\" directory first.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-                Application.Current.Shutdown();
-            }
+            this.ModList = new ObservableCollection<ModInfo>(mods);
         }
 
         private void ToggleButton_Click(object sender, RoutedEventArgs e)
@@ -113,7 +105,42 @@ namespace RyuGUI
         {
             if (RyuCLI.Program.WriteModListTxt(this.ModList.ToList()))
             {
-                MessageBox.Show("Mod list was saved. Mods will be applied next time the game is run.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                // Run generation only if it will not be run on game launch (i.e. if RebuildMLO is disabled)
+                if (!RyuCLI.Program.RebuildMLO)
+                {
+                    MessageBox.Show("Mod list was saved. Mods will be applied next time the game is run.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    //MessageBox.Show("Applying mods. Please wait...", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    // Open MessageBox on a separate thread
+                    Task.Run(() => MessageBox.Show("Applying mods. Please wait...", "Info", MessageBoxButton.OK, MessageBoxImage.Information));
+
+                    // Wait for the generation to finish
+                    bool success;
+                    try
+                    {
+                        Task<bool> gen = RyuCLI.Program.RunGeneration(RyuCLI.Program.ConvertNewToOldModList(this.ModList.ToList()));
+                        gen.Wait();
+                        success = gen.Result;
+                    }
+                    catch
+                    {
+                        success = false;
+                    }
+
+                    if (success)
+                    {
+                        MessageBox.Show("Mod list was saved and mods have been applied.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show(
+                            "Mods could not be applied. Please make sure that the game directory has write access. " +
+                            "\n\nRun Ryu Mod Manager in command line mode (use --cli parameter) for more info.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
             }
             else
             {

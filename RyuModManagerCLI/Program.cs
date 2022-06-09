@@ -19,9 +19,9 @@ namespace RyuCLI
 {
     public static class Program
     {
-        private const string VERSION = "v1.7";
-        private const string AUTHOR = "SutandoTsukai181";
-        private const string REPO = "RyuModManager";
+        public const string VERSION = "v1.7";
+        public const string AUTHOR = "SutandoTsukai181";
+        public const string REPO = "RyuModManager";
 
         private static bool externalModsOnly = true;
         private static bool looseFilesEnabled = false;
@@ -29,6 +29,8 @@ namespace RyuCLI
         private static bool isSilent = false;
 
         private static Task<ConsoleOutput> updateCheck = null;
+
+        public static bool RebuildMLO = true;
 
         public static async Task Main(string[] args)
         {
@@ -82,6 +84,11 @@ namespace RyuCLI
                     externalModsOnly = int.Parse(extMods) == 1;
                 }
 
+                if (ini.TryGetKey("Overrides.RebuildMLO", out string rebuildMLO))
+                {
+                    RebuildMLO = int.Parse(rebuildMLO) == 1;
+                }
+
                 if (!ini.TryGetKey("Parless.IniVersion", out string iniVersion) || int.Parse(iniVersion) < ParlessIni.CurrentVersion)
                 {
                     // Update if ini version is old (or does not exist)
@@ -91,6 +98,7 @@ namespace RyuCLI
                     {
                         // Force enable RebuildMLO option
                         ini.Sections["Overrides"]["RebuildMLO"] = "1";
+                        RebuildMLO = true;
                     }
 
                     iniParser.WriteFile(INI, IniTemplate.UpdateIni(ini));
@@ -110,10 +118,10 @@ namespace RyuCLI
                 // No need to check if console won't be shown anyway
                 checkForUpdates = false;
             }
-            else
+            else if (checkForUpdates)
             {
                 // Start checking for updates before the actual generation is done
-                updateCheck = Task.Run(() => CheckForUpdates());
+                updateCheck = Task.Run(() => CheckForUpdatesCLI());
             }
 
             if (GamePath.GetGame() != Game.Unsupported && !Directory.Exists(MODS))
@@ -122,6 +130,28 @@ namespace RyuCLI
                 Console.Write($"\"{MODS}\" folder was not found. Creating empty folder... ");
                 Directory.CreateDirectory(MODS);
                 Console.WriteLine("DONE!\n");
+            }
+
+            // TODO: Maybe move this to a separate "Game patches" file
+            // Virtua Fighter eSports crashes when used with dinput8.dll as the ASI loader
+            if (GamePath.GetGame() == Game.eve && File.Exists(DINPUT8DLL))
+            {
+                if (File.Exists(VERSIONDLL))
+                {
+                    Console.Write($"Game specific patch: Deleting {DINPUT8DLL} because {VERSIONDLL} exists...");
+
+                    // Remove dinput8.dll
+                    File.Delete(DINPUT8DLL);
+                }
+                else
+                {
+                    Console.Write($"Game specific patch: Renaming {DINPUT8DLL} to {VERSIONDLL}...");
+
+                    // Rename dinput8.dll to version.dll to prevent the game from crashing
+                    File.Move(DINPUT8DLL, VERSIONDLL);
+                }
+
+                Console.WriteLine(" DONE!\n");
             }
 
             // Read ini (again) to check if we should try importing the old load order file
@@ -174,76 +204,55 @@ namespace RyuCLI
             return mods;
         }
 
-        public static async Task RunGeneration(List<string> mods)
+        public static async Task<bool> RunGeneration(List<string> mods)
         {
+            if (File.Exists(MLO))
+            {
+                Console.Write("Removing old MLO...");
+
+                // Remove existing MLO file to avoid it being used if a new MLO won't be generated
+                File.Delete(MLO);
+
+                Console.WriteLine(" DONE!\n");
+            }
+
+            // Remove previously repacked pars, to avoid unwanted side effects
+            Repacker.RemoveOldRepackedPars();
+
             if (GamePath.GetGame() != Game.Unsupported)
             {
-                if (File.Exists(MLO))
-                {
-                    Console.Write("Removing old MLO...");
-
-                    // Remove existing MLO file to avoid it being used if a new MLO won't be generated
-                    File.Delete(MLO);
-
-                    Console.WriteLine(" DONE!\n");
-                }
-
-                // Remove previously repacked pars, to avoid unwanted side effects
-                Repacker.RemoveOldRepackedPars();
-
                 if (mods?.Count > 0 || looseFilesEnabled)
                 {
                     await GenerateModLoadOrder(mods, looseFilesEnabled).ConfigureAwait(false);
+                    return true;
                 }
-                else
-                {
-                    Console.WriteLine("Aborting: No mods were found, and .parless paths are disabled\n");
-                }
+
+                Console.WriteLine("Aborting: No mods were found, and .parless paths are disabled\n");
             }
             else
             {
                 Console.WriteLine("Aborting: No supported game was found in this directory\n");
             }
+
+            return false;
         }
 
         public static async Task PostRun()
         {
-            // TODO: Maybe move this to a separate "Game patches" file
-            // Virtua Fighter eSports crashes when used with dinput8.dll as the ASI loader
-            if (GamePath.GetGame() == Game.eve && File.Exists(DINPUT8DLL))
-            {
-                if (File.Exists(VERSIONDLL))
-                {
-                    Console.Write($"Game specific patch: Deleting {DINPUT8DLL} because {VERSIONDLL} exists...");
-
-                    // Remove dinput8.dll
-                    File.Delete(DINPUT8DLL);
-                }
-                else
-                {
-                    Console.Write($"Game specific patch: Renaming {DINPUT8DLL} to {VERSIONDLL}...");
-
-                    // Rename dinput8.dll to version.dll to prevent the game from crashing
-                    File.Move(DINPUT8DLL, VERSIONDLL);
-                }
-
-                Console.WriteLine(" DONE!\n");
-            }
-
             // Check if the ASI loader is not in the directory (possibly due to incorrect zip extraction)
-            if (!(File.Exists(DINPUT8DLL) || File.Exists(VERSIONDLL)))
+            if (MissingDLL())
             {
                 Console.WriteLine($"Warning: \"{DINPUT8DLL}\" is missing from this directory. RyuModManager will NOT function properly without this file\n");
             }
 
             // Check if the ASI is not in the directory
-            if (!File.Exists(ASI))
+            if (MissingASI())
             {
                 Console.WriteLine($"Warning: \"{ASI}\" is missing from this directory. RyuModManager will NOT function properly without this file\n");
             }
 
             // Calculate the checksum for the game's exe to inform the user if their version might be unsupported
-            if (ConsoleOutput.ShowWarnings && GetGame() != Game.Unsupported && !GameHash.ValidateFile(Path.Combine(GetGamePath(), GetGameExe()), GetGame()))
+            if (ConsoleOutput.ShowWarnings && InvalidGameExe())
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Warning: Game version is unsupported. Please use the latest Steam version of the game.");
@@ -274,6 +283,26 @@ namespace RyuCLI
                 Console.WriteLine("Program finished. Press any key to exit...");
                 Console.ReadKey();
             }
+        }
+
+        public static bool ShowWarnings()
+        {
+            return ConsoleOutput.ShowWarnings;
+        }
+
+        public static bool MissingDLL()
+        {
+            return !(File.Exists(DINPUT8DLL) || File.Exists(VERSIONDLL));
+        }
+
+        public static bool MissingASI()
+        {
+            return !File.Exists(ASI);
+        }
+
+        public static bool InvalidGameExe()
+        {
+            return GetGame() != Game.Unsupported && !GameHash.ValidateFile(Path.Combine(GetGamePath(), GetGameExe()), GetGame());
         }
 
         /// <summary>
@@ -386,6 +415,11 @@ namespace RyuCLI
             return externalModsOnly && Directory.Exists(GetExternalModsPath());
         }
 
+        public static bool ShouldCheckForUpdates()
+        {
+            return checkForUpdates;
+        }
+
         private static List<string> ScanMods()
         {
             return Directory.GetDirectories(GetModsPath())
@@ -394,28 +428,12 @@ namespace RyuCLI
                 .ToList();
         }
 
-        private static async Task<ConsoleOutput> CheckForUpdates()
+        public static async Task<Release> CheckForUpdates()
         {
             try
             {
-                ConsoleOutput console = new ConsoleOutput();
                 var client = new GitHubClient(new ProductHeaderValue(REPO));
-                var latestRelease = await client.Repository.Release.GetLatest(AUTHOR, REPO).ConfigureAwait(false);
-
-                if (latestRelease != null && latestRelease.Name.Contains("Ryu Mod Manager") && latestRelease.TagName != VERSION)
-                {
-                    console.WriteLine("New version detected!\n");
-                    console.WriteLine($"Current version: {VERSION}");
-                    console.WriteLine($"Latest version: {latestRelease.TagName}\n");
-
-                    console.WriteLine($"Please update by going to {latestRelease.HtmlUrl}");
-                }
-                else
-                {
-                    console.WriteLine("Current version is up to date");
-                }
-
-                return console;
+                return await client.Repository.Release.GetLatest(AUTHOR, REPO).ConfigureAwait(false);
             }
             catch
             {
@@ -423,6 +441,28 @@ namespace RyuCLI
             }
 
             return null;
+        }
+
+        private static async Task<ConsoleOutput> CheckForUpdatesCLI()
+        {
+            ConsoleOutput console = new ConsoleOutput();
+
+            var latestRelease = await CheckForUpdates().ConfigureAwait(true);
+
+            if (latestRelease != null && latestRelease.Name.Contains("Ryu Mod Manager") && latestRelease.TagName != VERSION)
+            {
+                console.WriteLine("New version detected!\n");
+                console.WriteLine($"Current version: {VERSION}");
+                console.WriteLine($"Latest version: {latestRelease.TagName}\n");
+
+                console.WriteLine($"Please update by going to {latestRelease.HtmlUrl}");
+            }
+            else
+            {
+                console.WriteLine("Current version is up to date");
+            }
+
+            return console;
         }
     }
 }
