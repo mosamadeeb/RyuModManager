@@ -164,41 +164,45 @@ namespace RyuCLI
                 // Only load the files inside the external mods path, and ignore the load order in the txt
                 mods.Add(new ModInfo(EXTERNAL_MODS));
             }
-            else if (File.Exists(TXT_OLD) && ini.GetKey("SavedSettings.ModListImported") == null)
-            {
-                Console.Write("Old format load order file (" + TXT_OLD + ") was found. Importing to the new format...");
-
-                // Migrate old format to new
-                mods.AddRange(ConvertOldToNewModList(ReadModLoadOrderTxt(TXT_OLD)).Where(m => !mods.Contains(m)));
-
-                ini.Sections.AddSection("SavedSettings");
-                ini["SavedSettings"].AddKey("ModListImported", "true");
-                iniParser.WriteFile(INI, ini);
-
-                Console.WriteLine("DONE!\n");
-
-                try
-                {
-                    File.Delete(TXT_OLD);
-                }
-                catch
-                {
-                    Console.WriteLine("Could not delete " + TXT_OLD + ". This file should be deleted manually.");
-                }
-            }
-            else if (File.Exists(TXT))
-            {
-                mods.AddRange(ReadModListTxt(TXT).Where(m => !mods.Contains(m)));
-            }
             else
             {
-                Console.WriteLine(TXT + " was not found. Will load all existing mods.\n");
-            }
+                if (File.Exists(TXT_OLD) && ini.GetKey("SavedSettings.ModListImported") == null)
+                {
+                    Console.Write("Old format load order file (" + TXT_OLD + ") was found. Importing to the new format...");
 
-            if (Directory.Exists(MODS))
-            {
-                // Add all scanned mods that have not been added to the load order yet
-                mods.AddRange(ScanMods().Where(n => !mods.Any(m => m.Name == n)).Select(m => new ModInfo(m)));
+                    // Migrate old format to new
+                    mods.AddRange(ConvertOldToNewModList(ReadModLoadOrderTxt(TXT_OLD)).Where(n => !mods.Any(m => m.Name == n.Name)));
+
+                    ini.Sections.AddSection("SavedSettings");
+                    ini["SavedSettings"].AddKey("ModListImported", "true");
+                    iniParser.WriteFile(INI, ini);
+
+                    Console.WriteLine("DONE!\n");
+
+                    try
+                    {
+                        File.Delete(TXT_OLD);
+                    }
+                    catch
+                    {
+                        Console.WriteLine("Could not delete " + TXT_OLD + ". This file should be deleted manually.");
+                    }
+                }
+
+                if (File.Exists(TXT))
+                {
+                    mods.AddRange(ReadModListTxt(TXT).Where(n => !mods.Any(m => m.Name == n.Name)));
+                }
+                else
+                {
+                    Console.WriteLine(TXT + " was not found. Will load all existing mods.\n");
+                }
+
+                if (Directory.Exists(MODS))
+                {
+                    // Add all scanned mods that have not been added to the load order yet
+                    mods.AddRange(ScanMods().Where(n => !mods.Any(m => m.Name == n)).Select(m => new ModInfo(m)));
+                }
             }
 
             return mods;
