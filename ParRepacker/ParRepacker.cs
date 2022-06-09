@@ -96,7 +96,10 @@ namespace ParRepacker
             {
                 foreach (string modFile in GetModFiles(parPath, mod, console))
                 {
-                    fileDict.Add(modFile, mod);
+                    if (!fileDict.ContainsKey(modFile))
+                    {
+                        fileDict.Add(modFile, mod);
+                    }
                 }
             }
 
