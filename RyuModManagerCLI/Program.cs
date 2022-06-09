@@ -411,7 +411,7 @@ namespace RyuCLI
 
         public static List<string> ConvertNewToOldModList(List<ModInfo> mods)
         {
-            return mods.Select(m => m.Name).ToList();
+            return mods.Where(m => m.Enabled).Select(m => m.Name).ToList();
         }
 
         public static bool ShouldBeExternalOnly()
