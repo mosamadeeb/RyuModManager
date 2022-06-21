@@ -28,11 +28,11 @@ namespace ModLoadOrder
             {
                 for (int j = modIndices[i]; j < modIndices[i + 1]; j++)
                 {
-                    this.Files.Add((files[j].ToLower().Replace('\\', '/'), i));
+                    this.Files.Add((files[j].ToLowerInvariant().Replace('\\', '/'), i));
                 }
             }
 
-            this.ParlessFolders = parlessFolders.Select(f => (f.Item1.ToLower().Replace('\\', '/'), f.Item2)).ToList();
+            this.ParlessFolders = parlessFolders.Select(f => (f.Item1.ToLowerInvariant().Replace('\\', '/'), f.Item2)).ToList();
         }
 
         public void WriteMLO(string path)
