@@ -8,6 +8,11 @@
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
     <ApplicationIcon>rmm_icon_2.ico</ApplicationIcon>
     <AssemblyName>RyuModManager</AssemblyName>
+    <Version>2.1</Version>
+    <Authors>SutandoTsukai181</Authors>
+    <Company />
+    <Product>Ryu Mod Manager</Product>
+    <RepositoryUrl>https://github.com/SutandoTsukai181/RyuModManager</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
