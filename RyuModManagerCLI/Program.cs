@@ -179,12 +179,12 @@ namespace RyuCLI
 
                     // Migrate old format to new
                     Console.Write("Old format load order file (" + TXT_OLD + ") was found. Importing to the new format...");
-                    mods.AddRange(ConvertOldToNewModList(ReadModLoadOrderTxt(TXT_OLD)).Where(n => !mods.Any(m => m.Name == n.Name)));
+                    mods.AddRange(ConvertOldToNewModList(ReadModLoadOrderTxt(TXT_OLD)).Where(n => !mods.Any(m => EqualModNames(m.Name, n.Name))));
                     Console.WriteLine(" DONE!\n");
                 }
                 else if (File.Exists(TXT))
                 {
-                    mods.AddRange(ReadModListTxt(TXT).Where(n => !mods.Any(m => m.Name == n.Name)));
+                    mods.AddRange(ReadModListTxt(TXT).Where(n => !mods.Any(m => EqualModNames(m.Name, n.Name))));
                 }
                 else
                 {
@@ -195,7 +195,7 @@ namespace RyuCLI
                 {
                     // Add all scanned mods that have not been added to the load order yet
                     Console.Write("Scanning for mods...");
-                    mods.AddRange(ScanMods().Where(n => !mods.Any(m => m.Name == n)).Select(m => new ModInfo(m, defaultEnabled)));
+                    mods.AddRange(ScanMods().Where(n => !mods.Any(m => EqualModNames(m.Name, n))).Select(m => new ModInfo(m, defaultEnabled)));
                     Console.WriteLine(" DONE!\n");
                 }
             }
@@ -452,6 +452,11 @@ namespace RyuCLI
                 .Select(d => Path.GetFileName(d.TrimEnd(new char[] { Path.DirectorySeparatorChar })))
                 .Where(m => (m != "Parless") && (m != EXTERNAL_MODS))
                 .ToList();
+        }
+
+        private static bool EqualModNames(string m, string n)
+        {
+            return string.Compare(m, n, StringComparison.InvariantCultureIgnoreCase) == 0;
         }
 
         public static async Task<Release> CheckForUpdates()
