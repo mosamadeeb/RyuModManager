@@ -17,6 +17,8 @@
         Yakuza6,
         YakuzaKiwami2,
         YakuzaLikeADragon,
+        Judgment,
+        LostJudgment,
         eve, // Virtua Fighter eSports
     }
 }
