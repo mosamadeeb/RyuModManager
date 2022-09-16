@@ -154,6 +154,38 @@ namespace RyuHelpers
 
                 Console.WriteLine(" DONE!\n");
             }
+            else if (GamePath.GetGame() == Game.LostJudgment)
+            {
+                // Lost Judgment does not like Ultimate ASI Loader, so instead we use a custom build of DllSpoofer (https://github.com/Kazurin-775/DllSpoofer)
+                if (File.Exists(DINPUT8DLL))
+                {
+                    Console.Write($"Game specific patch: Deleting {DINPUT8DLL} because it causes crashes with Lost Judgment...");
+
+                    // Remove dinput8.dll
+                    File.Delete(DINPUT8DLL);
+
+                    Console.WriteLine(" DONE!\n");
+                }
+
+                if (!File.Exists(WINMMDLL))
+                {
+                    if (File.Exists(WINMMLJ))
+                    {
+                        Console.Write($"Game specific patch: Enabling {WINMMDLL} by renaming {WINMMLJ} to fix Lost Judgment crashes...");
+
+                        // Rename dinput8.dll to version.dll to prevent the game from crashing
+                        File.Move(WINMMLJ, WINMMDLL);
+
+                        Console.WriteLine(" DONE!\n");
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"WARNING: {WINMMLJ} was not found. Lost Judgment will NOT load mods without this file. Please redownload Ryu Mod Manager.\n");
+                        Console.ResetColor();
+                    }
+                }
+            }
 
             // Read ini (again) to check if we should try importing the old load order file
             ini = iniParser.ReadFile(INI);
@@ -291,7 +323,7 @@ namespace RyuHelpers
 
         public static bool MissingDLL()
         {
-            return !(File.Exists(DINPUT8DLL) || File.Exists(VERSIONDLL));
+            return !(File.Exists(DINPUT8DLL) || File.Exists(VERSIONDLL) || File.Exists(WINMMDLL));
         }
 
         public static bool MissingASI()
