@@ -11,7 +11,8 @@ namespace Utils
         {
             using MD5 md5Hash = MD5.Create();
             using FileStream file = File.OpenRead(path);
-            return GetGameHash(game).SequenceEqual(md5Hash.ComputeHash(file));
+            var gameHash = GetGameHash(game);
+            return gameHash.Length == 0 || gameHash.SequenceEqual(md5Hash.ComputeHash(file));
         }
 
         private static byte[] GetGameHash(Game game)
