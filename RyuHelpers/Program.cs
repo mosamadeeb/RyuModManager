@@ -14,6 +14,7 @@ using ModLoadOrder.Mods;
 using static ModLoadOrder.Generator;
 using static Utils.GamePath;
 using static Utils.Constants;
+using System.Diagnostics;
 
 namespace RyuHelpers
 {
@@ -41,6 +42,16 @@ namespace RyuHelpers
             // Parse arguments
             List<string> list = new List<string>(args);
 
+            if (list.Contains("-h") || list.Contains("--help"))
+            {
+                Console.WriteLine("Usage: run without arguments to generate mod load order.");
+                Console.WriteLine("       run with \"-s\" or \"--silent\" flag to prevent checking for updates and remove prompts.");
+                Console.WriteLine("       run with \"-r\" or \"--run\" flag to run the game after the program finishes.");
+                Console.WriteLine("       run with \"-h\" or \"--help\" flag to show this message and exit.");
+
+                return;
+            }
+
             if (list.Contains("-s") || list.Contains("--silent"))
             {
                 isSilent = true;
@@ -48,6 +59,20 @@ namespace RyuHelpers
 
             await RunGeneration(ConvertNewToOldModList(PreRun())).ConfigureAwait(true);
             await PostRun().ConfigureAwait(true);
+
+            if (list.Contains("-r") || list.Contains("--run"))
+            {
+                // Run game
+                if (File.Exists(GetGameExe()))
+                {
+                    Console.WriteLine($"Launching \"{GetGameExe()}\"...");
+                    Process.Start(GetGameExe());
+                }
+                else
+                {
+                    Console.WriteLine($"Warning: Could not run game because \"{GetGameExe()}\" does not exist.");
+                }
+            }
         }
 
         public static List<ModInfo> PreRun()
