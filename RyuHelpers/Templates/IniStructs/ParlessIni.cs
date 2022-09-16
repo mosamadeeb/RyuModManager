@@ -4,7 +4,7 @@ namespace RyuHelpers.Templates
 {
     public static class ParlessIni
     {
-        public const int CurrentVersion = 4;
+        public const int CurrentVersion = 5;
 
         public static List<IniSection> GetParlessSections()
         {
@@ -169,6 +169,12 @@ namespace RyuHelpers.Templates
                             Name = "LogAll",
                             Comments = new List<string> { "Write filepaths for every file that gets loaded into allFilepaths.txt" },
                             DefaultValue = 0,
+                        },
+                        new IniKey
+                        {
+                            Name = "IgnoreNonPaths",
+                            Comments = new List<string> { "Do not log any strings that are not proper filepaths" },
+                            DefaultValue = 1,
                         },
                     },
                 },
