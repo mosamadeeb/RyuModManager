@@ -7,7 +7,7 @@
     <StartupObject>RyuGUI.Program</StartupObject>
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
     <ApplicationIcon>rmm_icon_2.ico</ApplicationIcon>
-    <AssemblyName>RyuModManagerGUI</AssemblyName>
+    <AssemblyName>RyuModManager</AssemblyName>
     <Version>2.1</Version>
     <Authors>SutandoTsukai181</Authors>
     <Company />

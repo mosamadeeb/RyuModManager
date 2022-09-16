@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31105.61
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32819.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RyuCLI", "RyuModManagerCLI\RyuCLI.csproj", "{DD6F4A69-AC5E-4D9D-858A-C269F1A266F1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RyuHelpers", "RyuHelpers\RyuHelpers.csproj", "{DD6F4A69-AC5E-4D9D-858A-C269F1A266F1}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C9439EA3-3BE6-45D4-9A5B-FF7E8EBDFA2B} = {C9439EA3-3BE6-45D4-9A5B-FF7E8EBDFA2B}
 	EndProjectSection
@@ -20,6 +20,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RyuGUI", "RyuGUI\RyuGUI.csp
 	ProjectSection(ProjectDependencies) = postProject
 		{DD6F4A69-AC5E-4D9D-858A-C269F1A266F1} = {DD6F4A69-AC5E-4D9D-858A-C269F1A266F1}
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RyuCLI", "RyuCLI\RyuCLI.csproj", "{3432CE1F-05CF-46C0-BAA2-E94D19021FE1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{86DD46D2-E68A-4D1B-A339-48C99A916652}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86DD46D2-E68A-4D1B-A339-48C99A916652}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86DD46D2-E68A-4D1B-A339-48C99A916652}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3432CE1F-05CF-46C0-BAA2-E94D19021FE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3432CE1F-05CF-46C0-BAA2-E94D19021FE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3432CE1F-05CF-46C0-BAA2-E94D19021FE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3432CE1F-05CF-46C0-BAA2-E94D19021FE1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -7,7 +7,7 @@ using IniParser;
 using IniParser.Model;
 using Octokit;
 using Utils;
-using RyuCLI.Templates;
+using RyuHelpers.Templates;
 using ParRepacker;
 using ModLoadOrder.Mods;
 
@@ -15,7 +15,7 @@ using static ModLoadOrder.Generator;
 using static Utils.GamePath;
 using static Utils.Constants;
 
-namespace RyuCLI
+namespace RyuHelpers
 {
     public static class Program
     {

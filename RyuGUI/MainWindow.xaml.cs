@@ -15,7 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ModLoadOrder.Mods;
-using RyuCLI;
+using RyuHelpers;
 
 namespace RyuGUI
 {
@@ -103,10 +103,10 @@ namespace RyuGUI
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            if (RyuCLI.Program.SaveModList(this.ModList.ToList()))
+            if (RyuHelpers.Program.SaveModList(this.ModList.ToList()))
             {
                 // Run generation only if it will not be run on game launch (i.e. if RebuildMLO is disabled)
-                if (RyuCLI.Program.RebuildMLO)
+                if (RyuHelpers.Program.RebuildMLO)
                 {
                     MessageBox.Show("Mod list was saved. Mods will be applied next time the game is run.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
@@ -119,7 +119,7 @@ namespace RyuGUI
                     bool success;
                     try
                     {
-                        Task<bool> gen = RyuCLI.Program.RunGeneration(RyuCLI.Program.ConvertNewToOldModList(this.ModList.ToList()));
+                        Task<bool> gen = RyuHelpers.Program.RunGeneration(RyuHelpers.Program.ConvertNewToOldModList(this.ModList.ToList()));
                         gen.Wait();
                         success = gen.Result;
                     }

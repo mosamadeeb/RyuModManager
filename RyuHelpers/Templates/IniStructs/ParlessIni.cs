@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace RyuCLI.Templates
+namespace RyuHelpers.Templates
 {
     public static class ParlessIni
     {

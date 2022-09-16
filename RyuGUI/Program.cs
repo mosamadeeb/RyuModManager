@@ -25,10 +25,10 @@ namespace RyuGUI
             if (args.Length == 0)
             {
                 // Read the mod list (and execute other RMM stuff)
-                List<ModInfo> mods = RyuCLI.Program.PreRun();
+                List<ModInfo> mods = RyuHelpers.Program.PreRun();
 
                 // This should be called only after PreRun() to make sure the ini value was loaded
-                if (RyuCLI.Program.ShouldBeExternalOnly())
+                if (RyuHelpers.Program.ShouldBeExternalOnly())
                 {
                     MessageBox.Show(
                         "External mods folder detected. Please run Ryu Mod Manager in CLI mode " +
@@ -43,16 +43,16 @@ namespace RyuGUI
                     return;
                 }
 
-                if (RyuCLI.Program.ShouldCheckForUpdates())
+                if (RyuHelpers.Program.ShouldCheckForUpdates())
                 {
                     // Run the task and let it show the message whenever it's done
                     Task.Run(() => CheckForUpdatesGUI());
                 }
 
-                if (RyuCLI.Program.ShowWarnings())
+                if (RyuHelpers.Program.ShowWarnings())
                 {
                     // Check if the ASI loader is not in the directory (possibly due to incorrect zip extraction)
-                    if (RyuCLI.Program.MissingDLL())
+                    if (RyuHelpers.Program.MissingDLL())
                     {
                         MessageBox.Show(
                             DINPUT8DLL + " is missing from this directory. Mods will NOT be applied without this file.",
@@ -60,7 +60,7 @@ namespace RyuGUI
                     }
 
                     // Check if the ASI is not in the directory
-                    if (RyuCLI.Program.MissingASI())
+                    if (RyuHelpers.Program.MissingASI())
                     {
                         MessageBox.Show(
                             ASI + " is missing from this directory. Mods will NOT be applied without this file.",
@@ -68,7 +68,7 @@ namespace RyuGUI
                     }
 
                     // Calculate the checksum for the game's exe to inform the user if their version might be unsupported
-                    if (RyuCLI.Program.InvalidGameExe())
+                    if (RyuHelpers.Program.InvalidGameExe())
                     {
                         MessageBox.Show(
                             "Game version is unsupported. Please use the latest Steam version of the game. " +
@@ -101,7 +101,7 @@ namespace RyuGUI
                 if (consoleEnabled)
                     AllocConsole();
 
-                RyuCLI.Program.Main(args).Wait();
+                RyuHelpers.Program.Main(args).Wait();
 
                 if (consoleEnabled)
                     FreeConsole();
@@ -110,9 +110,9 @@ namespace RyuGUI
 
         private static async Task CheckForUpdatesGUI()
         {
-            var latestRelease = await RyuCLI.Program.CheckForUpdates().ConfigureAwait(false);
+            var latestRelease = await RyuHelpers.Program.CheckForUpdates().ConfigureAwait(false);
 
-            if (latestRelease != null && latestRelease.Name.Contains("Ryu Mod Manager") && latestRelease.TagName != RyuCLI.Program.VERSION)
+            if (latestRelease != null && latestRelease.Name.Contains("Ryu Mod Manager") && latestRelease.TagName != RyuHelpers.Program.VERSION)
             {
                 MessageBoxResult result = MessageBox.Show(
                     "New version available! Go to the release webpage?",
