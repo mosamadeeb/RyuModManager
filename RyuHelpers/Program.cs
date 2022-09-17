@@ -221,6 +221,20 @@ namespace RyuHelpers
             {
                 // Only load the files inside the external mods path, and ignore the load order in the txt
                 mods.Add(new ModInfo(EXTERNAL_MODS));
+
+                if (GamePath.GetGame() == Game.Judgment || GamePath.GetGame() == Game.LostJudgment)
+                {
+                    // Disable RebuildMLO when using an external mod manager
+                    if (ini.TryGetKey("Overrides.RebuildMLO", out string _))
+                    {
+                        Console.Write($"Game specific patch: Disabling RebuildMLO for Judgment and Lost Judgment when using an external mod manager...");
+
+                        ini.Sections["Overrides"]["RebuildMLO"] = "0";
+                        iniParser.WriteFile(INI, ini);
+
+                        Console.WriteLine(" DONE!\n");
+                    }
+                }
             }
             else
             {
