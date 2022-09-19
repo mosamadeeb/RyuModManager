@@ -12,17 +12,27 @@ namespace ModLoadOrder.Mods
 
         public string Name { get; set; }
 
-        // Files that can be directly loaded from the mod path
+        /// <summary>
+        /// Files that can be directly loaded from the mod path.
+        /// </summary>
         public List<string> Files { get; }
 
-        // Folders that have to be repacked into pars before running the game
+        /// <summary>
+        /// Folders that have to be repacked into pars before running the game.
+        /// </summary>
         public List<string> ParFolders { get; }
+
+        /// <summary>
+        /// Folders that need to be bound as a directory to a CPK binder.
+        /// </summary>
+        public List<string> CpkFolders { get; }
 
         public Mod(string name, int indent = 2)
         {
             this.Name = name;
             this.Files = new List<string>();
             this.ParFolders = new List<string>();
+            this.CpkFolders = new List<string>();
 
             this.console = new ConsoleOutput(indent);
             this.console.WriteLine($"Reading directory: {name} ...");
@@ -42,6 +52,11 @@ namespace ModLoadOrder.Mods
                 if (this.ParFolders.Count > 0)
                 {
                     this.console.WriteLine($"Added {this.ParFolders.Count} folder(s) to be repacked");
+                }
+
+                if (this.CpkFolders.Count > 0)
+                {
+                    this.console.WriteLine($"Added {this.CpkFolders.Count} CPK folder(s) to be bound");
                 }
             }
             else
@@ -96,6 +111,39 @@ namespace ModLoadOrder.Mods
                     {
                         check = this.CheckFolder(basename);
                     }
+                    break;
+                default:
+                    break;
+            }
+
+            // Check for CPK directories
+            string cpkDataPath;
+            switch (basename)
+            {
+                case "se":
+                case "speech":
+                    cpkDataPath = GamePath.RemoveModPath(path);
+                    if (GamePath.GetGame() == Game.Yakuza5)
+                    {
+                        this.CpkFolders.Add(cpkDataPath + ".cpk");
+                        this.console.WriteLineIfVerbose($"Adding CPK folder: {cpkDataPath}");
+                    }
+
+                    break;
+                case "stream":
+                case "stream_en":
+                case "stmdlc":
+                case "stmdlc_en":
+                case "movie":
+                case "moviesd":
+                case "moviesd_dlc":
+                    cpkDataPath = GamePath.RemoveModPath(path);
+                    if (GamePath.GetGame() == Game.Judgment || GamePath.GetGame() == Game.LostJudgment)
+                    {
+                        this.CpkFolders.Add(cpkDataPath + ".par");
+                        this.console.WriteLineIfVerbose($"Adding CPK folder: {cpkDataPath}");
+                    }
+
                     break;
                 default:
                     break;

@@ -55,6 +55,7 @@ namespace ModLoadOrder
             string modPath;
             string subPathName;
             List<string> foldersNotFound;
+            Dictionary<string, List<int>> cpkDictionary = new Dictionary<string, List<int>>();
             Console.WriteLine("Reading mods...\n");
 
             // TODO: Make mod reading async
@@ -68,10 +69,20 @@ namespace ModLoadOrder
 
                 mod.PrintInfo();
 
-                if (mod.Files.Count > 0 || mod.ParFolders.Count > 0)
+                if (mod.Files.Count > 0 || mod.ParFolders.Count > 0 || mod.CpkFolders.Count > 0)
                 {
                     files.UnionWith(mod.Files);
                     modIndices.Add(files.Count);
+
+                    foreach (string folder in mod.CpkFolders)
+                    {
+                        if (!cpkDictionary.ContainsKey(folder))
+                        {
+                            cpkDictionary[folder] = new List<int>();
+                        }
+
+                        cpkDictionary[folder].Add(mods.Count - 1 - i);
+                    }
                 }
                 else
                 {
@@ -119,7 +130,7 @@ namespace ModLoadOrder
             Console.Write($"Generating {Constants.MLO} file...");
 
             // Generate MLO
-            ModLoadOrder mlo = new ModLoadOrder(modIndices, mods, files, loose.ParlessFolders);
+            ModLoadOrder mlo = new ModLoadOrder(modIndices, mods, files, loose.ParlessFolders, cpkDictionary);
             mlo.WriteMLO(Path.Combine(GamePath.GetGamePath(), Constants.MLO));
 
             Console.WriteLine(" DONE!\n");

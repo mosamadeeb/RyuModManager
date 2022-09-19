@@ -11,14 +11,15 @@ namespace ModLoadOrder
     {
         public const string MAGIC    = "_OLM"; // MLO_ but in little endian cause that's how the yakuza works
         public const uint ENDIANNESS = 0x21; // Little endian
-        public const uint VERSION    = 0x010002; // 1.2
+        public const uint VERSION    = 0x020000; // 2.0
         public const uint FILESIZE   = 0x0; // Remaining faithful to RGG by adding a filesize that is not used
 
         public List<string> Mods;
         public List<(string, int)> Files;
         public List<(string, int)> ParlessFolders;
+        public List<(string, List<ushort>)> CpkFolders;
 
-        public ModLoadOrder(List<int> modIndices, List<string> mods, OrderedSet<string> fileSet, List<(string, int)> parlessFolders)
+        public ModLoadOrder(List<int> modIndices, List<string> mods, OrderedSet<string> fileSet, List<(string, int)> parlessFolders, Dictionary<string, List<int>> cpkFolders)
         {
             List<string> files = fileSet.ToList();
 
@@ -33,6 +34,7 @@ namespace ModLoadOrder
             }
 
             this.ParlessFolders = parlessFolders.Select(f => (f.Item1.ToLowerInvariant().Replace('\\', '/'), f.Item2)).ToList();
+            this.CpkFolders = cpkFolders.Select(pair => (pair.Key.ToLowerInvariant().Replace('\\', '/'), pair.Value.Select(v => (ushort)v).ToList())).ToList();
         }
 
         public void WriteMLO(string path)
@@ -45,7 +47,7 @@ namespace ModLoadOrder
             writer.Write(VERSION);
             writer.Write(FILESIZE);
 
-            writer.Write(0x30); // Mods start (size of header)
+            writer.Write(0x40); // Mods start (size of header)
             writer.WriteOfType(typeof(uint), this.Mods.Count);
 
             writer.Write(0); // Files start (to be written later)
@@ -54,8 +56,11 @@ namespace ModLoadOrder
             writer.Write(0); // Parless folders start (to be written later)
             writer.WriteOfType(typeof(uint), this.ParlessFolders.Count);
 
-            // Align
-            writer.WriteTimes(0, 8);
+            writer.Write(0); // Cpk folders start (to be written later)
+            writer.WriteOfType(typeof(uint), this.CpkFolders.Count);
+
+            // Pad
+            writer.WriteTimes(0, 0x10);
 
             // 0x0: length
             // 0x2: string
@@ -89,6 +94,24 @@ namespace ModLoadOrder
                 writer.Write(folder);
             }
 
+            long cpkFoldersStartPos = writer.Stream.Position;
+
+            // 0x0: mod count
+            // 0x2: length
+            // 0x4: string
+            // 0x?: mod indices
+            foreach ((string folder, List<ushort> indices) in this.CpkFolders)
+            {
+                writer.WriteOfType(typeof(ushort), indices.Count);
+                writer.WriteOfType(typeof(ushort), folder.Length + 1);
+                writer.Write(folder);
+
+                foreach (ushort index in indices)
+                {
+                    writer.WriteOfType(typeof(ushort), index);
+                }
+            }
+
             // Write file size
             writer.Stream.Seek(0xC, SeekOrigin.Begin);
             writer.WriteOfType(typeof(uint), writer.Stream.Length);
@@ -97,9 +120,13 @@ namespace ModLoadOrder
             writer.Stream.Seek(0x18, SeekOrigin.Begin);
             writer.WriteOfType(typeof(uint), fileStartPos);
 
-            // Write mods start position
+            // Write parless folders start position
             writer.Stream.Seek(0x20, SeekOrigin.Begin);
             writer.WriteOfType(typeof(uint), parlessStartPos);
+
+            // Write cpk folders start position
+            writer.Stream.Seek(0x28, SeekOrigin.Begin);
+            writer.WriteOfType(typeof(uint), cpkFoldersStartPos);
 
             // Close the file stream
             writer.Stream.Dispose();
