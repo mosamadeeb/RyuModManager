@@ -4,7 +4,7 @@ namespace RyuHelpers.Templates
 {
     public static class ParlessIni
     {
-        public const int CurrentVersion = 5;
+        public const int CurrentVersion = 6;
 
         public static List<IniSection> GetParlessSections()
         {
@@ -88,6 +88,7 @@ namespace RyuHelpers.Templates
                                 "should have little to no effect on the time it takes to launch,",
                                 "and should help users avoid mistakenly not rebuilding.",
                                 "Optional QOL feature to help you avoid having to re-run the mod manager every time.",
+                                "NOTE: This is not supported by Judgment and Lost Judgment due to technical issues.",
                             },
                             DefaultValue = 1,
                         },

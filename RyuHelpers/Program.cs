@@ -179,12 +179,12 @@ namespace RyuHelpers
 
                 Console.WriteLine(" DONE!\n");
             }
-            else if (GamePath.GetGame() == Game.LostJudgment)
+            else if (GamePath.GetGame() == Game.Judgment || GamePath.GetGame() == Game.LostJudgment)
             {
-                // Lost Judgment does not like Ultimate ASI Loader, so instead we use a custom build of DllSpoofer (https://github.com/Kazurin-775/DllSpoofer)
+                // Lost Judgment (and Judgment post update 1) does not like Ultimate ASI Loader, so instead we use a custom build of DllSpoofer (https://github.com/Kazurin-775/DllSpoofer)
                 if (File.Exists(DINPUT8DLL))
                 {
-                    Console.Write($"Game specific patch: Deleting {DINPUT8DLL} because it causes crashes with Lost Judgment...");
+                    Console.Write($"Game specific patch: Deleting {DINPUT8DLL} because it causes crashes with Judgment games...");
 
                     // Remove dinput8.dll
                     File.Delete(DINPUT8DLL);
@@ -196,7 +196,7 @@ namespace RyuHelpers
                 {
                     if (File.Exists(WINMMLJ))
                     {
-                        Console.Write($"Game specific patch: Enabling {WINMMDLL} by renaming {WINMMLJ} to fix Lost Judgment crashes...");
+                        Console.Write($"Game specific patch: Enabling {WINMMDLL} by renaming {WINMMLJ} to fix Judgment games crashes...");
 
                         // Rename dinput8.dll to version.dll to prevent the game from crashing
                         File.Move(WINMMLJ, WINMMDLL);
@@ -206,7 +206,7 @@ namespace RyuHelpers
                     else
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine($"WARNING: {WINMMLJ} was not found. Lost Judgment will NOT load mods without this file. Please redownload Ryu Mod Manager.\n");
+                        Console.WriteLine($"WARNING: {WINMMLJ} was not found. Judgment games will NOT load mods without this file. Please redownload Ryu Mod Manager.\n");
                         Console.ResetColor();
                     }
                 }
