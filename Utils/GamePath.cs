@@ -121,6 +121,20 @@ namespace Utils
             return FileExistsInData(RemoveModPath(path) + ".par");
         }
 
+        public static bool IsXbox(string path)
+        {
+            try
+            {
+                using FileStream file = File.OpenRead(path);
+                file.Close();
+                return false;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return true;
+            }
+        }
+
         public static Game GetGame()
         {
             if (!currentGame.HasValue)
