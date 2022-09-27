@@ -123,7 +123,16 @@ namespace Utils
 
         public static bool IsXbox(string path)
         {
-            return path.Contains("\\Content\\");
+            try
+            {
+                using FileStream file = File.OpenRead(path);
+                file.Close();
+                return false;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return true;
+            }
         }
 
         public static Game GetGame()
