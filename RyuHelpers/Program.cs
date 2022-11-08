@@ -271,6 +271,19 @@ namespace RyuHelpers
                 }
             }
 
+            if (GamePath.IsXbox(Path.Combine(GetGamePath(), GetGameExe())))
+            {
+                if (ini.TryGetKey("Overrides.RebuildMLO", out string _))
+                {
+                    Console.Write($"Game specific patch: Disabling RebuildMLO for Xbox games...");
+
+                    ini.Sections["Overrides"]["RebuildMLO"] = "0";
+                    iniParser.WriteFile(INI, ini);
+
+                    Console.WriteLine(" DONE!\n");
+                }
+            }
+
             return mods;
         }
 
@@ -372,7 +385,8 @@ namespace RyuHelpers
 
         public static bool InvalidGameExe()
         {
-            return GetGame() != Game.Unsupported && !GameHash.ValidateFile(Path.Combine(GetGamePath(), GetGameExe()), GetGame());
+            string path = Path.Combine(GetGamePath(), GetGameExe());
+            return GetGame() == Game.Unsupported || GamePath.IsXbox(path) || !GameHash.ValidateFile(path, GetGame());
         }
 
         /// <summary>

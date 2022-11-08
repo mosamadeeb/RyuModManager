@@ -121,6 +121,11 @@ namespace Utils
             return FileExistsInData(RemoveModPath(path) + ".par");
         }
 
+        public static bool IsXbox(string path)
+        {
+            return path.Contains(Path.DirectorySeparatorChar + "Content" + Path.DirectorySeparatorChar);
+        }
+
         public static Game GetGame()
         {
             if (!currentGame.HasValue)
