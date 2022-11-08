@@ -8,7 +8,7 @@
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
     <ApplicationIcon>rmm_icon_2.ico</ApplicationIcon>
     <AssemblyName>RyuModManagerGUI</AssemblyName>
-    <Version>3.1</Version>
+    <Version>3.3</Version>
     <Authors>SutandoTsukai181</Authors>
     <Company />
     <Product>Ryu Mod Manager</Product>
