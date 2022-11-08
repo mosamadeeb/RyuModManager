@@ -105,8 +105,8 @@ namespace RyuGUI
         {
             if (RyuHelpers.Program.SaveModList(this.ModList.ToList()))
             {
-                // Run generation only if it will not be run on game launch (i.e. if RebuildMLO is disabled)
-                if (RyuHelpers.Program.RebuildMLO)
+                // Run generation only if it will not be run on game launch (i.e. if RebuildMLO is disabled or unsupported)
+                if (RyuHelpers.Program.RebuildMLO && RyuHelpers.Program.IsRebuildMLOSupported)
                 {
                     MessageBox.Show("Mod list was saved. Mods will be applied next time the game is run.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 }

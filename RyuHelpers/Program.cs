@@ -33,6 +33,7 @@ namespace RyuHelpers
         private static Task<ConsoleOutput> updateCheck = null;
 
         public static bool RebuildMLO = true;
+        public static bool IsRebuildMLOSupported = true;
 
         public static async Task Main(string[] args)
         {
@@ -181,6 +182,8 @@ namespace RyuHelpers
             }
             else if (GamePath.GetGame() == Game.Judgment || GamePath.GetGame() == Game.LostJudgment)
             {
+                IsRebuildMLOSupported = false;
+
                 // Lost Judgment (and Judgment post update 1) does not like Ultimate ASI Loader, so instead we use a custom build of DllSpoofer (https://github.com/Kazurin-775/DllSpoofer)
                 if (File.Exists(DINPUT8DLL))
                 {
